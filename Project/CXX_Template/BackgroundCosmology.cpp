@@ -26,6 +26,11 @@ BackgroundCosmology::BackgroundCosmology(
   //...
   //...
   //...
+  H0 = 100*h;
+  OmegaR = pow(M_PI, 3)/15.0*pow(Constants.k_b*TCMB, 4)/(pow(Constants.hbar, 3)*pow(Constants.c, 4))*8*M_PI*Constants.G/(3*H0);
+  OmegaNu = 0;
+  OmegaK = 0;
+  printf("Sum of Omegas = %e\n", OmegaR + OmegaCDM + OmegaB + OmegaLambda);
 }
 
 //====================================================
@@ -40,7 +45,14 @@ void BackgroundCosmology::solve(){
   // TODO: Set the range of x and the number of points for the splines
   // For this Utils::linspace(x_start, x_end, npts) is useful
   //=============================================================================
-  Vector x_array;
+  int npts = 1000;
+  double a_start = 1e-7;
+  double a_stop = 1;
+  double x_start = log(a_start);
+  double x_stop = log(a_start);
+
+  Vector x_array = Utils::linspace(x_start, x_end, npts);
+
 
   // The ODE for deta/dx
   ODEFunction detadx = [&](double x, const double *eta, double *detadx){
@@ -80,7 +92,8 @@ double BackgroundCosmology::H_of_x(double x) const{
   //...
   //...
 
-  return 0.0;
+  double Omega_sum = get_OmegaCDM(x) + get_OmegaB(x) + get_OmegaLambda(x) + get_OmegaR(x);
+  return get_H0()*sqrt(Omega_sum);
 }
 
 double BackgroundCosmology::Hp_of_x(double x) const{
@@ -91,7 +104,7 @@ double BackgroundCosmology::Hp_of_x(double x) const{
   //...
   //...
 
-  return 0.0;
+  return exp(x)*H_of_x(x);
 }
 
 double BackgroundCosmology::dHpdx_of_x(double x) const{
@@ -125,7 +138,7 @@ double BackgroundCosmology::get_OmegaB(double x) const{
   //...
   //...
 
-  return 0.0;
+  return OmegaB*exp(-3*x);
 }
 
 double BackgroundCosmology::get_OmegaR(double x) const{ 
@@ -137,7 +150,7 @@ double BackgroundCosmology::get_OmegaR(double x) const{
   //...
   //...
 
-  return 0.0;
+  return OmegaR*exp(-4*x);
 }
 
 double BackgroundCosmology::get_OmegaNu(double x) const{ 
@@ -161,7 +174,7 @@ double BackgroundCosmology::get_OmegaCDM(double x) const{
   //...
   //...
 
-  return 0.0;
+  return OmegaCDM*exp(-3*x);
 }
 
 double BackgroundCosmology::get_OmegaLambda(double x) const{ 
@@ -173,7 +186,7 @@ double BackgroundCosmology::get_OmegaLambda(double x) const{
   //...
   //...
 
-  return 0.0;
+  return OmegaLambda;
 }
 
 double BackgroundCosmology::get_OmegaK(double x) const{ 
