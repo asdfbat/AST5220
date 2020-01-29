@@ -9,6 +9,10 @@ CC = g++ -std=c++11
 INC  = -I$(HOME)/local/include 
 LIBS = -L$(HOME)/local/lib -lgsl -lgslcblas 
 
+# Matplotlibcpp stuff
+INC += -I/usr/include/python3.7
+LIBS += -lpython3.7m
+
 
 #=======================================================
 # Options
