@@ -80,78 +80,54 @@ void BackgroundCosmology::solve(){
   Utils::EndTiming("Eta");
 }
 
+
 //====================================================
 // Get methods
 //====================================================
 
+
 double BackgroundCosmology::H_of_x(double x) const{
-
-  //=============================================================================
-  // TODO: Implement...
-  //=============================================================================
-  //...
-  //...
-
   double Omega_sum = get_OmegaCDM(x) + get_OmegaB(x) + get_OmegaLambda(x) + get_OmegaR(x);
   return get_H0()*sqrt(Omega_sum);
 }
 
+
 double BackgroundCosmology::Hp_of_x(double x) const{
-
-  //=============================================================================
-  // TODO: Implement...
-  //=============================================================================
-  //...
-  //...
-
   return exp(x)*H_of_x(x);
 }
 
-double BackgroundCosmology::dHpdx_of_x(double x) const{
 
+double BackgroundCosmology::dHpdx_of_x(double x) const{
   //=============================================================================
   // TODO: Implement...
   //=============================================================================
   //...
   //...
-
   return 0.0;
 }
+
 
 double BackgroundCosmology::ddHpddx_of_x(double x) const{
-
   //=============================================================================
   // TODO: Implement...
   //=============================================================================
   //...
   //...
-
   return 0.0;
 }
+
 
 double BackgroundCosmology::get_OmegaB(double x) const{ 
   if(x == 0.0) return OmegaB;
-
-  //=============================================================================
-  // TODO: Implement...
-  //=============================================================================
-  //...
-  //...
-
   return OmegaB*exp(-3*x);
 }
 
+
 double BackgroundCosmology::get_OmegaR(double x) const{ 
   if(x == 0.0) return OmegaR;
-
-  //=============================================================================
-  // TODO: Implement...
-  //=============================================================================
-  //...
-  //...
-
   return OmegaR*exp(-4*x);
 }
+
 
 double BackgroundCosmology::get_OmegaNu(double x) const{ 
   if(x == 0.0) return OmegaNu;
