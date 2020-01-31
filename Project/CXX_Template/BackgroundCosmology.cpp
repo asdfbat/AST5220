@@ -18,14 +18,6 @@ BackgroundCosmology::BackgroundCosmology(
   Neff(Neff), 
   TCMB(TCMB)
 {
-
-  //=============================================================================
-  // TODO: Compute OmegaR, OmegaNu, OmegaK, H0, ...
-  //=============================================================================
-  //...
-  //...
-  //...
-  //...
   H0 = 100*h;
   H0_SI = H0*1000/Constants.Mpc;
   OmegaR = pow(M_PI, 3)/15.0*pow(Constants.k_b*TCMB, 4)/(pow(Constants.hbar, 3)*pow(Constants.c, 5))*8*M_PI*Constants.G/(3*H0_SI*H0_SI);
@@ -35,18 +27,10 @@ BackgroundCosmology::BackgroundCosmology(
   printf("OmegaR0 = %e\n", OmegaR);
 }
 
-//====================================================
-// Do all the solving. Compute eta(x)
-//====================================================
-
 // Solve the background
 void BackgroundCosmology::solve(){
   Utils::StartTiming("Eta");
     
-  //=============================================================================
-  // TODO: Set the range of x and the number of points for the splines
-  // For this Utils::linspace(x_start, x_end, npts) is useful
-  //=============================================================================
   int npts = 1000;
   double a_start = 1e-7;
   double a_stop = 1;
@@ -59,26 +43,13 @@ void BackgroundCosmology::solve(){
 
   // The ODE for deta/dx
   ODEFunction detadx = [&](double x, const double *eta, double *detadx){
-
-    //=============================================================================
-    // TODO: Set the rhs of the detadx ODE
-    //=============================================================================
-    //...
-    //...
-
     detadx[0] = Constants.c/Hp_of_x(x);
-
     return GSL_SUCCESS;
   };
 
   //=============================================================================
-  // TODO: Set the initial condition, set up the ODE system, solve and make
-  // the spline eta_of_x_spline 
+  // Set the initial condition, set up the ODE system, solve and make the spline eta_of_x_spline.
   //=============================================================================
-  // ...
-  // ...
-  // ...
-  // ...
 
   Vector eta_inc = {0.0};
 
@@ -101,10 +72,10 @@ void BackgroundCosmology::solve(){
 //====================================================
 
 
-double BackgroundCosmology::H_of_x(double x) const{
+double BackgroundCosmology::H_of_x(double x) const{  // Note: SI Units are used, not km/Mpc/s.
   double Omega_sum = OmegaCDM*exp(-3*x) + OmegaB*exp(-3*x) + OmegaR*exp(-4*x) + OmegaLambda;
   // double Omega_sum = get_OmegaCDM(x) + get_OmegaB(x) + get_OmegaLambda(x) + get_OmegaR(x);
-  return get_H0()*sqrt(Omega_sum);
+  return get_H0_SI()*sqrt(Omega_sum);
 }
 
 
@@ -134,13 +105,13 @@ double BackgroundCosmology::ddHpddx_of_x(double x) const{
 
 
 double BackgroundCosmology::get_OmegaB(double x) const{ 
-  double Htemp = H0/H_of_x(x);
+  double Htemp = get_H0_SI()/H_of_x(x);
   return OmegaB*exp(-3*x)*Htemp*Htemp;
 }
 
 
 double BackgroundCosmology::get_OmegaR(double x) const{ 
-  double Htemp = H0/H_of_x(x);
+  double Htemp = get_H0_SI()/H_of_x(x);
   return OmegaR*exp(-4*x)*Htemp*Htemp;
 }
 
@@ -151,13 +122,13 @@ double BackgroundCosmology::get_OmegaNu(double x) const{
 
 
 double BackgroundCosmology::get_OmegaCDM(double x) const{ 
-  double Htemp = H0/H_of_x(x);
+  double Htemp = get_H0_SI()/H_of_x(x);
   return OmegaCDM*exp(-3*x)*Htemp*Htemp;
 }
 
 
 double BackgroundCosmology::get_OmegaLambda(double x) const{ 
-  double Htemp = H0/H_of_x(x);
+  double Htemp = get_H0_SI()/H_of_x(x);
   return OmegaLambda*Htemp*Htemp;
 }
 
@@ -171,6 +142,10 @@ double BackgroundCosmology::eta_of_x(double x) const{
 
 double BackgroundCosmology::get_H0() const{ 
   return H0; 
+}
+
+double BackgroundCosmology::get_H0_SI() const{ 
+  return H0_SI;
 }
 
 double BackgroundCosmology::get_h() const{ 
@@ -207,9 +182,9 @@ void BackgroundCosmology::info() const{
 // Output some data to file
 //====================================================
 void BackgroundCosmology::output(const std::string filename) const{
-  const double x_min = -10.0;
+  const double x_min = -15.0;
   const double x_max =  0.0;
-  const int    n_pts =  100;
+  const int    n_pts =  10000;
   
   Vector x_array = Utils::linspace(x_min, x_max, n_pts);
 

@@ -69,6 +69,7 @@ class BackgroundCosmology{
     double get_OmegaK(double x = 0.0) const; 
     double get_OmegaMnu(double x = 0.0) const; 
     double get_H0() const;
+    double get_H0_SI() const;
     double get_h() const;
     double get_Neff() const;
     double get_TCMB() const;
