@@ -20,7 +20,7 @@ BackgroundCosmology::BackgroundCosmology(
 {
   H0 = 100*h;
   H0_SI = H0*1000/Constants.Mpc;
-  OmegaR = pow(M_PI, 3)/15.0*pow(Constants.k_b*TCMB, 4)/(pow(Constants.hbar, 3)*pow(Constants.c, 5))*8*M_PI*Constants.G/(3*H0_SI*H0_SI);
+  OmegaR = pow(M_PI, 2)/15.0*pow(Constants.k_b*TCMB, 4)/(pow(Constants.hbar, 3)*pow(Constants.c, 5))*8*M_PI*Constants.G/(3*H0_SI*H0_SI);
   OmegaNu = 0;
   OmegaK = 0;
   printf("Sum of Omegas = %e\n", OmegaR + OmegaCDM + OmegaB + OmegaLambda);
