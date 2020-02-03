@@ -97,15 +97,34 @@ We also introduce the scaled Hubble parameter $\mathcal{H} = aH = \dot{a}$.
 As well as $a$, $x$, and $t$ for measuring time in the universe, we will introduce the conformal time $\eta$. $\eta$ has units of length, and represents the size of the event horizon at any given time. In other words, $\eta$ is the distance traversed by undisturbed light since the Big Bang.
 
 [Insert definition of Conformal time]
+[Why do we use length instead of time?]
+
+\begin{align}\label{eqn:eta}
+    \dv{\eta}{a} = \frac{c}{a\mathcal{H}}
+\end{align}
+
+We can rewrite the LHS as a derivative in regards to $x$ as
+\begin{align*}
+    \dv{\eta}{a} = \dv{\eta}{x}\dv{x}{a} = \dv{\eta}{x}\frac{1}{a}
+\end{align*}
+
+which, inserting into \ref{eqn:eta} gives us the differential equation
+\begin{align*}
+    \dv{\eta}{x} = \frac{c}{\mathcal{H}(x)}
+\end{align*}
 
 
-
-\newpage
 \section{Results}
+Figure \ref{fig:Omegas} shows the distribution of relative densities over time. We observe that the very early universe is completely radiation dominated, which gradually evolves into matter domination, the turnover point being at $x=-8.7$, or $z=6000$. At $x=-3$, the universe energy content comes almost exclusively from baryons and CDM. This quickly changes into dark energy domination, at $x=-0.28$, or $z=0.33$, which is the era we're in today. We also observe that the total relative density sums perfectly to 1 at all times.
+
+Figure \ref{fig:Eta} shows the evolution of conformal time and the Hubble parameter over time. In the two bottom plots, the Hubble parameter shows three regimes of linear behavior (although the last one is subtle in the x-dependent plot), which corresponds to exponential dependence on x, and power-law dependence on z and a. The three linear regimes are split by the matter-radiation equality, and the radiation-dark energy equality, both indicated in the plots. In the rediation dominated regime, $H \propto a^2$, during the matter dominated regine, $H \propto a^{1.5}$, and in the dark energy dominated regine, $H$ is constant.
+
+
+
 \begin{figure}[H]
     \centering
     \includegraphics[scale=0.4]{../figs/Omegas.pdf}
-    \caption{}
+    \caption{Plot showing the relative density distribution of components as function of $x=\log{a}$. Radiation, matter, and dark energy dominated eras are highlighted in their respective colors.}
     \label{fig:Omegas}
 \end{figure}
 
@@ -113,10 +132,9 @@ As well as $a$, $x$, and $t$ for measuring time in the universe, we will introdu
 \begin{figure}[H]
     \centering
     \includegraphics[scale=0.4]{../figs/Eta.pdf}
-    \caption{}
+    \caption{Plots showing the comformal time (top-right), the scaled Hubble parameter (top-right), and the Hubble parameter (bottom-left) as function of $x=\log{a}$. The bottom-right panel shows the Hubble parameter as function of reshift $z$. All plots show the matter-radiation equality as a striped yellow line.}
     \label{fig:Eta}
 \end{figure}
-
 
 
 
