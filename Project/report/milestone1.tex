@@ -54,14 +54,14 @@ We consider a flat, expanding universe, goverened by the $\Lambda \text{CDM}$ mo
 \end{equation*}
 We also define $\rho_{i,o}$ and $\Omega_{i,o}$ to represents the critical and relative densities today.
 
-It can be shown that the density components evolve with time as $\rho_i(a) = \rho_{i,0}a^{-3(1+w_i)}$ where $w_i$ is some constant for each component. For our four compoenents, we have that
+It can be shown that the density components evolve with time as $\rho_i(a) = \rho_{i,0}a^{-3(1+w_i)}$ where $w_i$ is some constant for each component. For our four compoenents, the densities evolve as
 \begin{align*}
     \rho_b &= \rho_{b,0} a^{-3} \\
     \rho_\text{CDM} &= \rho_{\text{CDM},0} a^{-3} \\
     \rho_r &= \rho_{r,0} a^{-4} \\
     \rho_\Lambda &= \rho_{\Lambda,0}
 \end{align*}
-where $a$ is the \textit{scale factor} of the universe, describing its relative size to today, which is defined to be $a_0 = 1$.
+where $a$ is the \textit{scale factor} of the universe, describing its relative size to today. Todays value is defined to be $a_0 = 1$.
 
 We wish to avoid the densities where possible, and work directly with the relative densities and the scale factor. The relative densities can be rewritten to exclude $\rho_i$ the following way.
 \begin{align*}
@@ -69,9 +69,9 @@ We wish to avoid the densities where possible, and work directly with the relati
 \end{align*}
 
 Knowing that $\rho_c = \frac{3H^2}{8\pi G}$, which gives $\rho_{c,0} = \frac{3H_0^2}{8\pi G}$ we get that
-\begin{align*}
+\begin{align}
     \Omega_{i} = \qty(\frac{H_0}{H})^2\Omega_{i,0}a^{-3(1+w_i)}
-\end{align*}
+\end{align}
 
 
 \subsection{The Friedmann equation}
@@ -94,24 +94,41 @@ We also introduce the scaled Hubble parameter $\mathcal{H} = aH = \dot{a}$.
 
 
 \subsection{Conformal Time}
-As well as $a$, $x$, and $t$ for measuring time in the universe, we will introduce the conformal time $\eta$. $\eta$ has units of length, and represents the size of the event horizon at any given time. In other words, $\eta$ is the distance traversed by undisturbed light since the Big Bang.
+As well as $a$, $x$, and $t$ for measuring time in the universe, we will introduce the conformal time $\eta$. $\eta$ has units of length, and represents the size of the event horizon at any given time. In other words, $\eta$ is the distance traversed by undisturbed light since the Big Bang. Conformal time is also commonly used in units of time, gained by dividing our quantity by $c$, thereby having the interpretation of the time it would take a photon to traverse the universe at that given time (given that the expansion "froze" for the duration of the photons travel).
 
-[Insert definition of Conformal time]
-[Why do we use length instead of time?]
+\begin{equation}
+    \eta = \int_0^t \frac{c}{a(t)} \dd{t}
+\end{equation}
 
+Or, on differential equation form
+\begin{equation}
+    \dv{\eta}{t} = \frac{c}{a}
+\end{equation}
+
+This can be written as a differential equation with regards to $a$.
+\begin{equation*}
+    \dv{\eta}{a}\dv{a}{t} = \dv{\eta}{a}\frac{1}{\mathcal{H}} = \frac{c}{a}
+\end{equation*}
+
+Resulting in the ODE
 \begin{align}\label{eqn:eta}
     \dv{\eta}{a} = \frac{c}{a\mathcal{H}}
 \end{align}
 
-We can rewrite the LHS as a derivative in regards to $x$ as
+This, again, can be rewritten as a function of $x = \log(a)$ as
 \begin{align*}
     \dv{\eta}{a} = \dv{\eta}{x}\dv{x}{a} = \dv{\eta}{x}\frac{1}{a}
 \end{align*}
 
-which, inserting into \ref{eqn:eta} gives us the differential equation
-\begin{align*}
-    \dv{\eta}{x} = \frac{c}{\mathcal{H}(x)}
-\end{align*}
+which, inserting into \ref{eqn:eta} gives us the ODE
+\begin{align}\label{eqn:etaODE}
+    \dv{\eta}{x} = \frac{c}{\mathcal{H}}
+\end{align}
+
+
+\section{Method and Implementation}
+\subsection{Conformal time}
+Equation \ref{eqn:etaODE} is solved using GSLs ODESolver class, which employs the RungeKutta4 solver. $\eta$ is solved in the interval $x \in [-15, 0]$,
 
 
 \section{Results}
