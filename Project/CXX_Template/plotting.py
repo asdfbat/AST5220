@@ -11,7 +11,9 @@ N = data.shape[0]
 
 x = data[:,0]
 eta_of_x = data[:,1]/Constants.Mpc/1000  # Eta(x) in Gpc
-Hp_of_x = data[:,2]/1000*Constants.Mpc
+Hp_of_x_SI = data[:,2]
+Hp_of_x = Hp_of_x_SI/1000*Constants.Mpc
+H_of_x_SI = Hp_of_x_SI/np.exp(x)
 H_of_x = Hp_of_x/np.exp(x)
 OmegaB = data[:,4]
 OmegaCDM = data[:,5]
@@ -21,10 +23,7 @@ OmegaR = data[:,7]
 a = np.exp(x)
 z = 1/a - 1
 
-Eta_rad_dom = 3*Constants.c/H_of_x/a
-
-print(z[-2])
-print(H_of_x[-1])
+Eta_rad_dom = Constants.c/H_of_x_SI/a/Constants.Mpc/1000  # Analytical Eta in Gpc.
 
 
 fig, ax = plt.subplots(figsize=(12, 8))
@@ -49,6 +48,11 @@ DE_mat_equal = np.argmin(np.abs(OmegaLambda[N//2:]-(OmegaCDM[N//2:]+OmegaB[N//2:
 print(x[rad_mat_equal], x[DE_mat_equal])
 print(z[rad_mat_equal], z[DE_mat_equal])
 
+plt.semilogy(x, eta_of_x)
+plt.semilogy(x, Eta_rad_dom)
+plt.show()
+
+
 fig, ax = plt.subplots(2, 2, figsize=(16, 12))
 ax[0,0].semilogy(x, eta_of_x, lw=4)
 #ax[0,0].plot(x, Eta_rad_dom)
@@ -56,7 +60,7 @@ ax[0,0].axvline(x=x[rad_mat_equal], ls="--", lw=2, c="r", label="rad/mat equalit
 ax[0,0].axvline(x=x[DE_mat_equal], ls="--", lw=2, c="k", label="mat/DE equality")
 ax[0,0].set_xlabel("x")
 ax[0,0].set_ylabel(r"$\eta(x)$")
-ax[0,0].set_title("$\eta \ - \ [Gpc]$")
+ax[0,0].set_title(r"$\eta \ - \ [Gpc]$")
 #ax[0,0].set_ylim(0, 12.5)
 ax[0,0].legend()
 
@@ -65,7 +69,7 @@ ax[0,1].axvline(x=x[rad_mat_equal], ls="--", lw=2, c="r")
 ax[0,1].axvline(x=x[DE_mat_equal], ls="--", lw=2, c="k")
 ax[0,1].set_xlabel("x")
 ax[0,1].set_ylabel(r"$\mathcal{H}(x)$")
-ax[0,1].set_title("$\mathcal{H} \ - \ [km/s/Mpc]$")
+ax[0,1].set_title(r"$\mathcal{H} \ - \ [km/s/Mpc]$")
 
 ax[1,0].semilogy(x, H_of_x, lw=4)
 ax[1,0].axvline(x=x[rad_mat_equal], ls="--", lw=2, c="r")
@@ -73,7 +77,7 @@ ax[1,0].axvline(x=x[DE_mat_equal], ls="--", lw=2, c="k")
 ax[1,0].set_xlabel("x")
 ax[1,0].set_ylabel("H(x)")
 ax[1,0].set_ylabel(r"$H(x)$")
-ax[1,0].set_title("$H \ - \ [km/s/Mpc]$")
+ax[1,0].set_title(r"$H \ - \ [km/s/Mpc]$")
 
 ax[1,1].loglog(z, H_of_x, lw=4)
 ax[1,1].axvline(x=z[rad_mat_equal], ls="--", lw=2, c="r")
@@ -81,7 +85,7 @@ ax[1,1].axvline(x=z[DE_mat_equal], ls="--", lw=2, c="k")
 ax[1,1].set_xlim(1.5*z[0], 0.01)
 ax[1,1].set_xlabel("z")
 ax[1,1].set_ylabel(r"$H(z)$")
-ax[1,1].set_title("$H \ - \ [km/s/Mpc]$")
+ax[1,1].set_title(r"$H \ - \ [km/s/Mpc]$")
 
 plt.tight_layout()
 plt.savefig("../figs/Eta.pdf", bbox_inches="tight")

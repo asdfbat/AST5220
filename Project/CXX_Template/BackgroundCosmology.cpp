@@ -18,21 +18,21 @@ BackgroundCosmology::BackgroundCosmology(
   Neff(Neff), 
   TCMB(TCMB)
 {
-  H0 = 100*h;
-  H0_SI = H0*1000/Constants.Mpc;
-  OmegaR = pow(M_PI, 2)/15.0*pow(Constants.k_b*TCMB, 4)/(pow(Constants.hbar, 3)*pow(Constants.c, 5))*8*M_PI*Constants.G/(3*H0_SI*H0_SI);
+  H0 = Constants.H0_over_h*h;
+  OmegaR = pow(M_PI, 2)/15.0*pow(Constants.k_b*TCMB, 4)/(pow(Constants.hbar, 3)*pow(Constants.c, 5))*8*M_PI*Constants.G/(3*H0*H0);
   OmegaNu = 0;
   OmegaK = 0;
   printf("Sum of Omegas = %e\n", OmegaR + OmegaCDM + OmegaB + OmegaLambda);
   printf("OmegaR0 = %e\n", OmegaR);
+  printf("H0 in SI: %e\n", H0);
 }
 
 // Solve the background
 void BackgroundCosmology::solve(){
   Utils::StartTiming("Eta");
     
-  int npts = 1000;
-  double a_start = 1e-7;
+  int npts = 100000;
+  double a_start = 1e-12;
   double a_stop = 1;
   double x_start = log(a_start);
   double x_stop = log(a_stop);
@@ -74,8 +74,7 @@ void BackgroundCosmology::solve(){
 
 double BackgroundCosmology::H_of_x(double x) const{  // Note: SI Units are used, not km/Mpc/s.
   double Omega_sum = OmegaCDM*exp(-3*x) + OmegaB*exp(-3*x) + OmegaR*exp(-4*x) + OmegaLambda;
-  // double Omega_sum = get_OmegaCDM(x) + get_OmegaB(x) + get_OmegaLambda(x) + get_OmegaR(x);
-  return get_H0_SI()*sqrt(Omega_sum);
+  return get_H0()*sqrt(Omega_sum);
 }
 
 
@@ -105,13 +104,13 @@ double BackgroundCosmology::ddHpddx_of_x(double x) const{
 
 
 double BackgroundCosmology::get_OmegaB(double x) const{ 
-  double Htemp = get_H0_SI()/H_of_x(x);
+  double Htemp = get_H0()/H_of_x(x);
   return OmegaB*exp(-3*x)*Htemp*Htemp;
 }
 
 
 double BackgroundCosmology::get_OmegaR(double x) const{ 
-  double Htemp = get_H0_SI()/H_of_x(x);
+  double Htemp = get_H0()/H_of_x(x);
   return OmegaR*exp(-4*x)*Htemp*Htemp;
 }
 
@@ -122,13 +121,13 @@ double BackgroundCosmology::get_OmegaNu(double x) const{
 
 
 double BackgroundCosmology::get_OmegaCDM(double x) const{ 
-  double Htemp = get_H0_SI()/H_of_x(x);
+  double Htemp = get_H0()/H_of_x(x);
   return OmegaCDM*exp(-3*x)*Htemp*Htemp;
 }
 
 
 double BackgroundCosmology::get_OmegaLambda(double x) const{ 
-  double Htemp = get_H0_SI()/H_of_x(x);
+  double Htemp = get_H0()/H_of_x(x);
   return OmegaLambda*Htemp*Htemp;
 }
 
@@ -144,9 +143,6 @@ double BackgroundCosmology::get_H0() const{
   return H0; 
 }
 
-double BackgroundCosmology::get_H0_SI() const{ 
-  return H0_SI;
-}
 
 double BackgroundCosmology::get_h() const{ 
   return h; 
