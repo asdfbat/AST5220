@@ -23,7 +23,6 @@ OmegaR = data[:,7]
 a = np.exp(x)
 z = 1/a - 1
 
-Eta_rad_dom = Constants.c/H_of_x_SI/a/Constants.Mpc/1000  # Analytical Eta in Gpc.
 
 
 fig, ax = plt.subplots(figsize=(12, 8))
@@ -38,18 +37,42 @@ ax.fill_between(x, 0, 1, (OmegaR<(OmegaCDM+OmegaB) * ((OmegaCDM+OmegaB) > OmegaL
 ax.fill_between(x, 0, 1, (OmegaCDM+OmegaB) < OmegaLambda, alpha=0.2, color="black")
 ax.set_xlabel("x")
 ax.set_ylabel(r"$\Omega_i(x)$")
-plt.legend()
-plt.tight_layout()
-plt.savefig("../figs/Omegas.pdf", bbox_inches="tight")
-plt.clf()
+fig.legend()
+fig.tight_layout()
+fig.savefig("../figs/Omegas.pdf", bbox_inches="tight")
+plt.close(fig)
 
 rad_mat_equal = np.argmin(np.abs(OmegaR-(OmegaCDM+OmegaB)))
 DE_mat_equal = np.argmin(np.abs(OmegaLambda[N//2:]-(OmegaCDM[N//2:]+OmegaB[N//2:]))) + N//2
 print(x[rad_mat_equal], x[DE_mat_equal])
 print(z[rad_mat_equal], z[DE_mat_equal])
+print(a[rad_mat_equal], a[DE_mat_equal])
 
-plt.semilogy(x, eta_of_x)
-plt.semilogy(x, Eta_rad_dom)
+rad_max_idx = 0
+mat_max_idx = np.argmax(OmegaCDM + OmegaB)
+DE_max_idx = N-1
+
+
+a_star = a[mat_max_idx]
+a_star_idx = mat_max_idx
+a_lambda = a[DE_max_idx]
+a_lambda_idx = DE_max_idx
+
+Eta_rad_dom = Constants.c/H_of_x_SI/a/Constants.Mpc/1000  # Analytical Eta in Gpc.
+Eta_rad_dom_a_star = Constants.c/H_of_x_SI[a_star_idx]/a_star/Constants.Mpc/1000
+
+Eta_mat_dom = eta_of_x[mat_max_idx] + 2*Constants.c*(1/(a*H_of_x_SI) - a_star**0.5/(a**1.5*H_of_x_SI))/Constants.Mpc/1000
+Eta_mat_dom_a_lambda = Eta_rad_dom_a_star + 2*Constants.c*(1/(a_lambda*H_of_x_SI) - a_star**0.5/(a_lambda**1.5*H_of_x_SI))/Constants.Mpc/1000
+
+Eta_DE_dom = eta_of_x[DE_max_idx] + Constants.c/(H_of_x_SI)*(1/a_lambda - 1/a)/Constants.Mpc/1000
+
+fig, ax = plt.subplots(figsize=(12, 8))
+ax.semilogy(x, eta_of_x)
+ax.semilogy(x, Eta_rad_dom)
+ax.semilogy(x, Eta_mat_dom)
+ax.semilogy(x[N//2:], Eta_DE_dom[N//2:])
+ax.axvline(x=x[rad_mat_equal], ls="--")
+ax.axvline(x=x[DE_mat_equal], ls="--")
 plt.show()
 
 
@@ -87,6 +110,6 @@ ax[1,1].set_xlabel("z")
 ax[1,1].set_ylabel(r"$H(z)$")
 ax[1,1].set_title(r"$H \ - \ [km/s/Mpc]$")
 
-plt.tight_layout()
-plt.savefig("../figs/Eta.pdf", bbox_inches="tight")
-plt.clf()
+fig.tight_layout()
+fig.savefig("../figs/Eta.pdf", bbox_inches="tight")
+plt.close(fig)
