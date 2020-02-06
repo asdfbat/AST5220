@@ -1,4 +1,4 @@
-\documentclass[a4paper]{article}
+\documentclass[10pt, a4paper]{article}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc,url}
 \usepackage{multicol}
@@ -69,7 +69,7 @@ We wish to avoid the densities where possible, and work directly with the relati
 \end{align*}
 
 Knowing that $\rho_c = \frac{3H^2}{8\pi G}$, which gives $\rho_{c,0} = \frac{3H_0^2}{8\pi G}$ we get that
-\begin{align}
+\begin{align}\label{eqn:Omegas}
     \Omega_{i} = \qty(\frac{H_0}{H})^2\Omega_{i,0}a^{-3(1+w_i)}
 \end{align}
 
@@ -86,7 +86,7 @@ Since the universe takes on scales of many different orders of magnitude, the li
 \end{equation}
 
 The Friedmann equation now reads
-\begin{equation}
+\begin{equation} \label{eqn:Friedmann}
     H(x) = H_0\sqrt{\Omega_{b,0} e^{-3x} + \Omega_\text{{CDM},0}e^{-3x} + \Omega_{r,0}e^{-4x} + \Omega_{\Lambda,0}}
 \end{equation}
 
@@ -126,7 +126,39 @@ which, inserting into \ref{eqn:eta} gives us the ODE
 \end{align}
 
 
+\subsection{Analytical solution to conformal time}
+Analytical solutions to the conformal time exist in each of the domimant regimes (radiation, matter, DE). in the radiation dominated regime, $\eta$ takes the form
+\begin{align}
+    \eta_r = \frac{c}{aH(a)}.
+\end{align}
+
+In the matter dominated regime, $\eta$ takes the form
+\begin{align}
+    \eta_m = \eta(a_*) + 2c\qty[\frac{1}{aH(a)} - \frac{a_*^{1/2}}{a^{3/2}}]
+\end{align}
+where $a_*$ is some point where $\Omega_m \approx 1$.
+
+In the DE dominated regime, $\eta$ takes the form
+\begin{align}
+    \eta_\Lambda = \eta(a_\Lambda) + \frac{c}{H(a)}\qty[\frac{1}{a_\Lambda} - \frac{1}{a}]
+\end{align}
+where $a_\Lambda$ is some point where $\Omega_\Lambda \approx 1$. The two latter equations require known values of $\eta$ at certain points, preferably deep within their own dominant regime. If only these analytical approximations were available, an extrapolated value of $\eta$ from the previous era would have to be used, and the solution would suffer as a result.
+
 \section{Method and Implementation}
+\subsection{Density parameters and the Friedmann equation}
+We find the scaled Hubble parameter $\mathcal{H}$ explicitly from the Friedmann equation \ref{eqn:Friedmann} for x in the range $[-27.6, 4.6]$, using density values roughly corresponding to the best estimates of the $\Lambda$CDM model. These are
+\begin{align*}
+    \Omega_B &= 0.05 \\
+    \Omega_{CDM} &= 0.25 \\
+    \Omega_{\Lambda} &= 0.7
+\end{align*}
+while $\Omega_r$ is direcly calculated from todays observed temperature of the CMB, at $T_{CMB} = \SI{2.7255}{K}$, as
+\begin{align*}
+    \Omega_r = \frac{\pi^2}{15}\frac{\qty(k_bT_{CMB})^4}{\hbar^3c^5}\frac{8\pi G}{3H_0^2} \approx 5\times 10^{-5}
+\end{align*}
+Using the Hubble parameter, we calculate the relative densities of all components from equation \ref{eqn:Omegas}.
+
+
 \subsection{Conformal time}
 Equation \ref{eqn:etaODE} is solved using GSLs ODESolver class, which employs the RungeKutta4 solver. $\eta$ is solved in the interval $x \in [-15, 0]$,
 
@@ -140,18 +172,35 @@ Figure \ref{fig:Eta} shows the evolution of conformal time and the Hubble parame
 
 \begin{figure}[H]
     \centering
-    \includegraphics[scale=0.4]{../figs/Omegas.pdf}
-    \caption{Plot showing the relative density distribution of components as function of $x=\log{a}$. Radiation, matter, and dark energy dominated eras are highlighted in their respective colors.}
+    \includegraphics[scale=0.5]{../m1_figs/H.pdf}
+    \caption{Plots showing the comformal time (top-right), the scaled Hubble parameter (top-right), and the Hubble parameter (bottom-left) as function of $x=\log{a}$. The bottom-right panel shows the Hubble parameter as function of reshift $z$. All plots show the matter-radiation equality as a striped red line, and the matter-dark energy equality as a striped black line.}
     \label{fig:Omegas}
 \end{figure}
 
 
 \begin{figure}[H]
     \centering
-    \includegraphics[scale=0.4]{../figs/Eta.pdf}
-    \caption{Plots showing the comformal time (top-right), the scaled Hubble parameter (top-right), and the Hubble parameter (bottom-left) as function of $x=\log{a}$. The bottom-right panel shows the Hubble parameter as function of reshift $z$. All plots show the matter-radiation equality as a striped red line, and the matter-dark energy equality as a striped black line.}
+    \includegraphics[scale=0.5]{../m1_figs/Omegas.pdf}
+    \caption{Plot showing the relative density distribution of components as function of $x=\log{a}$. Radiation, matter, and dark energy dominated eras are highlighted in their respective colors.}
+    \label{fig:H}
+\end{figure}
+
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.5]{../m1_figs/Eta.pdf}
+    \caption{Plot showing the relative density distribution of components as function of $x=\log{a}$. Radiation, matter, and dark energy dominated eras are highlighted in their respective colors.}
     \label{fig:Eta}
 \end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.5]{../m1_figs/Eta2.pdf}
+    \caption{Plot showing the relative density distribution of components as function of $x=\log{a}$. Radiation, matter, and dark energy dominated eras are highlighted in their respective colors.}
+    \label{fig:Eta2}
+\end{figure}
+
+
 
 
 
