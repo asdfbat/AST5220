@@ -70,3 +70,6 @@ clean:
 
 plotm1:
 	python3 ../Python/m1_plotting.py
+
+run:
+	./cmb
