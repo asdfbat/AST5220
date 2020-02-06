@@ -33,12 +33,12 @@ void BackgroundCosmology::solve(){
     
   int npts = 100000;
   double a_start = 1e-12;
-  double a_stop = 1;
+  double a_stop = 1e2;
   double x_start = log(a_start);
   double x_stop = log(a_stop);
   printf("Solving conformal time for x in [%f, %f]\n", x_start, x_stop);
 
-  Vector x_array = Utils::linspace(x_start, x_end, npts);
+  Vector x_array = Utils::linspace(x_start, x_stop, npts);
 
 
   // The ODE for deta/dx
@@ -62,6 +62,7 @@ void BackgroundCosmology::solve(){
   }
 
   eta_of_x_spline.create(x_array, eta_data, "eta");
+  printf("%e %e \n", x_array[x_array.size()-1], eta_data[x_array.size()-1]);
 
   Utils::EndTiming("Eta");
 }
@@ -179,7 +180,7 @@ void BackgroundCosmology::info() const{
 //====================================================
 void BackgroundCosmology::output(const std::string filename) const{
   const double x_min = -15.0;
-  const double x_max =  0.0;
+  const double x_max =  4.0;
   const int    n_pts =  10000;
   
   Vector x_array = Utils::linspace(x_min, x_max, n_pts);
