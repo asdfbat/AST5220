@@ -126,27 +126,30 @@ which, inserting into \ref{eqn:eta} gives us the ODE
 \end{align}
 
 
-\subsection{Analytical solution to conformal time}
-Analytical solutions to the conformal time exist in each of the domimant regimes (radiation, matter, DE). in the radiation dominated regime, $\eta$ takes the form
+\subsection{Analytical solution to conformal time}\label{sec:conf}
+The conformal time integral is not analytically solvable for the complete Hubble parameter, but analytical solutions exist in each of the domimant regimes (radiation, matter, DE). In the radiation dominated regime, $\eta$ takes the form
 \begin{align}
-    \eta_r = \frac{c}{aH(a)}.
+    \eta_r = \frac{c}{aH_r(a)},  \quad  H_r(a) = \frac{1}{\sqrt{\Omega_r a^{4}}}.
 \end{align}
 
 In the matter dominated regime, $\eta$ takes the form
 \begin{align}
-    \eta_m = \eta(a_*) + 2c\qty[\frac{1}{aH(a)} - \frac{a_*^{1/2}}{a^{3/2}}]
+    \eta_m = \eta(a_*) + 2c\qty[\frac{1}{aH_m(a)} - \frac{a_*^{1/2}}{a^{3/2}}], \quad H_m = \frac{1}{\sqrt{(\Omega_m + \Omega_{CDM}) a^3}}.
 \end{align}
 where $a_*$ is some point where $\Omega_m \approx 1$.
 
 In the DE dominated regime, $\eta$ takes the form
 \begin{align}
-    \eta_\Lambda = \eta(a_\Lambda) + \frac{c}{H(a)}\qty[\frac{1}{a_\Lambda} - \frac{1}{a}]
+    \eta_\Lambda = \eta(a_\Lambda) + \frac{c}{H_\Lambda(a)}\qty[\frac{1}{a_\Lambda} - \frac{1}{a}], \quad H_\Lambda(a) = \frac{1}{\sqrt{\Omega_\Lambda}}.
 \end{align}
-where $a_\Lambda$ is some point where $\Omega_\Lambda \approx 1$. The two latter equations require known values of $\eta$ at certain points, preferably deep within their own dominant regime. If only these analytical approximations were available, an extrapolated value of $\eta$ from the previous era would have to be used, and the solution would suffer as a result.
+where $a_\Lambda$ is some point where $\Omega_\Lambda \approx 1$. The two latter equations require known values of $\eta$ at certain points, preferably deep within their own dominant regime. If only these analytical approximations are available, an extrapolated value of $\eta$ from the previous era approximation would have to be used.
+
+One possible enhancement of these expressions is to replace the final approximations of the Hubble parameters with the real deal. Even though the approximations are required to carry out the integral, we can insert the full Hubble parameter in place of the approximations in the final expression - $H_m = H_r = H_{\Lambda} = H$.
+
 
 \section{Method and Implementation}
 \subsection{Density parameters and the Friedmann equation}
-We find the scaled Hubble parameter $\mathcal{H}$ explicitly from the Friedmann equation \ref{eqn:Friedmann} for x in the range $[-27.6, 4.6]$, using density values roughly corresponding to the best estimates of the $\Lambda$CDM model. These are
+We find the scaled Hubble parameter $\mathcal{H}$ explicitly from the Friedmann equation \ref{eqn:Friedmann} for $x \in [-27.6, 4.6]$, using density values roughly corresponding to the best estimates of the $\Lambda$CDM model. These are
 \begin{align*}
     \Omega_B &= 0.05 \\
     \Omega_{CDM} &= 0.25 \\
@@ -154,19 +157,23 @@ We find the scaled Hubble parameter $\mathcal{H}$ explicitly from the Friedmann 
 \end{align*}
 while $\Omega_r$ is direcly calculated from todays observed temperature of the CMB, at $T_{CMB} = \SI{2.7255}{K}$, as
 \begin{align*}
-    \Omega_r = \frac{\pi^2}{15}\frac{\qty(k_bT_{CMB})^4}{\hbar^3c^5}\frac{8\pi G}{3H_0^2} \approx 5\times 10^{-5}
+    \Omega_r = \frac{\pi^2}{15}\frac{\qty(k_bT_{CMB})^4}{\hbar^3c^5}\frac{8\pi G}{3H_0^2} \approx 5\times 10^{-5}.
 \end{align*}
 Using the Hubble parameter, we calculate the relative densities of all components from equation \ref{eqn:Omegas}.
 
 
 \subsection{Conformal time}
-Equation \ref{eqn:etaODE} is solved using GSLs ODESolver class, which employs the RungeKutta4 solver. $\eta$ is solved in the interval $x \in [-15, 0]$,
+Equation \ref{eqn:etaODE} is solved in the interval $x \in [-27.6, 4.6]$, using GSLs ODESolver class, which employs the RungeKutta4 solver. The  As initial condition, we assume $\eta(x_0 = -27.6) = 0$, which corresponds to assuming that the size of the particle horizon is zero at $a=e^{-27.6} = 10^{-12}$. Since our results focus on the region of $x \in [-15, 4]$, this should be a fine approximation.
+
+In addition, we compare our numerical results to the analytical results described in section \ref{sec:conf}. We find $\eta(a_*)$ and $\eta(a_\Lambda)$ using both a purely analytical solution, extrapolating the previous solution, and "cheating", by inserting more correct numerical values. For both cases, we look at the behavior of the solutions using both the local approximations of the Hubble parameter ($H_m$, $H_r$...), and setting them equal to the full Hubble parameter $H_i = H(x)$.
 
 
 \section{Results}
-Figure \ref{fig:Omegas} shows the distribution of relative densities over time. We observe that the very early universe is completely radiation dominated, which gradually evolves into matter domination, the turnover point being at $x=-8.7$, or $z=6000$. At $x=-3$, the universe energy content comes almost exclusively from baryons and CDM. This quickly changes into dark energy domination, at $x=-0.28$, or $z=0.33$, which is the era we're in today. We also observe that the total relative density sums perfectly to 1 at all times.
+Figure \ref{fig:H} shows the evolution of conformal time and the Hubble parameter over time. In the two bottom plots, the Hubble parameter shows three linear regimes, which corresponds to exponential dependence on $x$, and power-law dependence on $z$ and $a$. The three linear regimes are split by the matter-radiation equality, and the radiation-dark energy equality, both indicated in the plots. In the rediation dominated regime, $H \propto a^2$, during the matter dominated regine, $H \propto a^{1.5}$, and in the dark energy dominated regine, $H$ is constant.
 
-Figure \ref{fig:Eta} shows the evolution of conformal time and the Hubble parameter over time. In the two bottom plots, the Hubble parameter shows three regimes of linear behavior (although the last one is subtle in the x-dependent plot), which corresponds to exponential dependence on x, and power-law dependence on z and a. The three linear regimes are split by the matter-radiation equality, and the radiation-dark energy equality, both indicated in the plots. In the rediation dominated regime, $H \propto a^2$, during the matter dominated regine, $H \propto a^{1.5}$, and in the dark energy dominated regine, $H$ is constant.
+The scaled Hubble parameter also shows three regimes of exponential dependence on $x$, although instead of leveling out, the DE regime shows it increasing. Since $\mathcal{H} = \dot{a}$, this regime has the universes expansion accelerating, while the radiation and matter dominated regimes have the expansion slowing down.
+
+Figure \ref{fig:Omegas} shows the distribution of relative densities over time. We observe that the very early universe is completely radiation dominated, which gradually evolves into matter domination, the turnover point being at $x=-8.7$, or $z=6000$. At $x=-3$, the universe energy content comes almost exclusively from baryons and CDM. This quickly changes into dark energy domination, at $x=-0.28$, or $z=0.33$, which is the era we're in today. We also observe that the total relative density sums perfectly to 1 at all times.
 
 
 
@@ -174,7 +181,7 @@ Figure \ref{fig:Eta} shows the evolution of conformal time and the Hubble parame
     \centering
     \includegraphics[scale=0.5]{../m1_figs/H.pdf}
     \caption{Plots showing the comformal time (top-right), the scaled Hubble parameter (top-right), and the Hubble parameter (bottom-left) as function of $x=\log{a}$. The bottom-right panel shows the Hubble parameter as function of reshift $z$. All plots show the matter-radiation equality as a striped red line, and the matter-dark energy equality as a striped black line.}
-    \label{fig:Omegas}
+    \label{fig:H}
 \end{figure}
 
 
@@ -182,21 +189,21 @@ Figure \ref{fig:Eta} shows the evolution of conformal time and the Hubble parame
     \centering
     \includegraphics[scale=0.5]{../m1_figs/Omegas.pdf}
     \caption{Plot showing the relative density distribution of components as function of $x=\log{a}$. Radiation, matter, and dark energy dominated eras are highlighted in their respective colors.}
-    \label{fig:H}
+    \label{fig:Omegas}
 \end{figure}
 
 
 \begin{figure}[H]
     \centering
     \includegraphics[scale=0.5]{../m1_figs/Eta.pdf}
-    \caption{Plot showing the relative density distribution of components as function of $x=\log{a}$. Radiation, matter, and dark energy dominated eras are highlighted in their respective colors.}
+    \caption{Plot showing the three analytical approximations of $\eta(x)$ in the three regimes, together with the numerical solution (orange line). The "anchor" values of $a_*$ and $a_\Lambda$ are taken from the numerical solution at $max(\Omega_i)$. Left: The Hubble parameters are left as their local approximations. Right: The Hubble parameters are given their full expression, $H_i = H(x)$.}
     \label{fig:Eta}
 \end{figure}
 
 \begin{figure}[H]
     \centering
     \includegraphics[scale=0.5]{../m1_figs/Eta2.pdf}
-    \caption{Plot showing the relative density distribution of components as function of $x=\log{a}$. Radiation, matter, and dark energy dominated eras are highlighted in their respective colors.}
+    \caption{Plot showing the three analytical approximations of $\eta(x)$ in the three regimes, together with the numerical solution (orange line). The "anchor" values of $a_*$ and $a_\Lambda$ are taken from the analytical approximation in the previous regime, making this a completely analytical expression. Left: The Hubble parameters are left as their local approximations. Right: The Hubble parameters are given their full expression, $H_i = H(x)$.}
     \label{fig:Eta2}
 \end{figure}
 
