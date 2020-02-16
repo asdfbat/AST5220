@@ -37,3 +37,9 @@
 *.aux
 *.fdb_latexmk
 *.gz
+
+*.blg
+
+*.bbl
+
+*.pyc
