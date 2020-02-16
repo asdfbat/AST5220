@@ -8,18 +8,17 @@ BackgroundCosmology::BackgroundCosmology(
     double h, 
     double OmegaB, 
     double OmegaCDM, 
-    double OmegaLambda,
-    double Neff, 
+    double Neff,
     double TCMB) :
   h(h),
   OmegaB(OmegaB),
   OmegaCDM(OmegaCDM),
-  OmegaLambda(OmegaLambda),
   Neff(Neff), 
   TCMB(TCMB)
 {
   H0 = Constants.H0_over_h*h;
   OmegaR = pow(M_PI, 2)/15.0*pow(Constants.k_b*TCMB, 4)/(pow(Constants.hbar, 3)*pow(Constants.c, 5))*8*M_PI*Constants.G/(3*H0*H0);
+  OmegaLambda = 1 - OmegaR - OmegaB - OmegaCDM;
   OmegaNu = 0;
   OmegaK = 0;
   printf("Sum of Omegas = %e\n", OmegaR + OmegaCDM + OmegaB + OmegaLambda);
