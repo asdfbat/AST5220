@@ -39,7 +39,7 @@
 
 
 \begin{document}
-\title{AST5220 -- Milestone I}
+\title{AST5220\\ Milestone I -- Background Cosmology}
 \author{
     \begin{tabular}{r l}
         Jonas Gahr Sturtzel Lunde & (\texttt{jonassl})
@@ -47,7 +47,8 @@
 % \date{}    % if commented out, the date is set to the current date
 
 \maketitle
-\vspace{2cm}
+Code found at \url{https://github.com/asdfbat/AST5220/tree/master/Project}
+\vspace{0.7cm}
 
 \section{Theory}
 \subsection{Components of the universe}
@@ -151,6 +152,12 @@ One possible enhancement of these expressions is to replace the final approximat
 
 
 \section{Method and implementation}
+\subsection{Code Overview}
+The code for reproducing our results can be found at \url{https://github.com/asdfbat/AST5220/tree/master/Project}. The C++ programs solving all equations are found in the directory named \texttt{src}, where a \texttt{Makefile} runs all code. The central code for this project can be found in the \textit{BackgroundCosmology} class in the file \texttt{src/BackgroundCosmology.cpp}. The class relies heavily on an implementation of GSL's ODESolver, found in the file \texttt{src/ODESolver.cpp}, and an implementation of GSL's spline interpolator, found in \texttt{src/spline.cpp}.
+
+Code for plotting all relevant results are found in \texttt{Python/m1\_plotting.py}.
+
+
 \subsection{Density parameters and the Friedmann equation}
 We find the scaled Hubble parameter $\mathcal{H}$ explicitly from the Friedmann equation \ref{eqn:Friedmann} for $x \in [-27.6, 4.6]$, using density values roughly corresponding to the best estimates of the $\Lambda$CDM model, found in \cite{callin2006}. These are
 \begin{align*}
@@ -169,7 +176,7 @@ Using the Hubble parameter, we calculate the relative densities of all component
 
 
 \subsection{Conformal time}
-Equation \ref{eqn:etaODE} is solved in the interval $x \in [-27.6, 4.6]$, using GSLs ODESolver class, which employs the RungeKutta4 solver. As initial condition, we assume $\eta(x_0 = -27.6) = 0$, which corresponds to assuming that the size of the particle horizon is zero at $a=e^{-27.6} = 10^{-12}$. Since our results focus on the region of $x \in [-15, 4]$, this should be a fine approximation.
+Equation \ref{eqn:etaODE} is solved in the interval $x \in [-27.6, 4.6]$, using an implementation of GSL's ODESolver class. As initial condition, we assume $\eta(x_0 = -27.6) = 0$, which corresponds to assuming that the size of the particle horizon is zero at $a=e^{-27.6} = 10^{-12}$. Since our results focus on the region of $x \in [-15, 4]$, this should be a fine approximation.
 
 In addition, we compare our numerical results to the analytical results described in section \ref{sec:conf}. We find $\eta(a_*)$ and $\eta(a_\Lambda)$ using both a purely analytical solution, extrapolating the previous solution, and "cheating", by inserting more correct numerical values. For both cases, we look at the behavior of the solutions using both the local approximations of the Hubble parameter ($H_m$, $H_r$...), and setting them equal to the full Hubble parameter $H_i = H(x)$.
 
