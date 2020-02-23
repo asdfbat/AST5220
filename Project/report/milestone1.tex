@@ -52,13 +52,13 @@ Code found at \url{https://github.com/asdfbat/AST5220/tree/master/Project}
 
 \section{Theory}
 \subsection{Components of the universe}
-We consider a flat, expanding universe, governed by the $\Lambda \text{CDM}$ model. Our universe contains some densities of baryonic matter ($\rho_b$), cold dark matter ($\rho_{CDM}$), radiation ($\rho_r$), and dark energy ($\rho_\Lambda$). Let $\Omega_i = \dfrac{\rho_i}{\rho_c}$ be the \textit{relative densities} of each component. Here, $\rho_c$ is the \textit{critical density}, being the total density which would make the universe entirely flat. Since our universe is indeed flat, is follows that
+We consider a flat, expanding universe, governed by the $\Lambda \text{CDM}$ model. Our universe contains some densities of baryonic matter ($\rho_b$), cold dark matter ($\rho_{CDM}$), radiation ($\rho_r$), and dark energy ($\rho_\Lambda$). Let $\Omega_i = \dfrac{\rho_i}{\rho_c}$ be the \textit{relative densities} of each component. Here, $\rho_c$ is the \textit{critical density}, being the total density which would make the universe entirely flat. We will consider a flat universe (as ours is believed to be), from which it follows that
 \begin{equation}\label{eqn:sum1}
     \sum_i \rho_i = \rho_c \quad \Rightarrow \quad \sum_i \Omega_i = 1
 \end{equation}
 We also define $\rho_{i,o}$ and $\Omega_{i,o}$ to represents the critical and relative densities today.
 
-It can be shown \cite{ModernCosmology2003} that the density components evolve with time as $\rho_i(a) = \rho_{i,0}a^{-3(1+w_i)}$ where $w_i$ is some constant for each component. For our four components, the densities evolve as
+It can be shown \cite{ModernCosmology2003} that the density components evolve with time as $\rho_i(a) = \rho_{i,0}a^{-3(1+w_i)}$ where $w_i$ is some constant for each density component. For our four components, the densities evolve as
 \begin{align*}
     \rho_b &= \rho_{b,0} a^{-3} \\
     \rho_\text{CDM} &= \rho_{\text{CDM},0} a^{-3} \\
@@ -67,7 +67,7 @@ It can be shown \cite{ModernCosmology2003} that the density components evolve wi
 \end{align*}
 where $a$ is the \textit{scale factor} of the universe, describing its relative size to today. Today's value is defined to be $a_0 = 1$.
 
-We wish to avoid the densities where possible, and work directly with the relative densities and the scale factor. The relative densities can be rewritten to exclude $\rho_i$ the following way.
+We wish to avoid the absolute densities where possible, and work directly with the relative densities and the scale factor. The relative densities can be rewritten to exclude $\rho_i$ the following way:
 \begin{align*}
     \Omega_{i} = \frac{\rho_i}{\rho_c} = \frac{\rho_{i,0}a^{-3(1+w_i)}}{\rho_c} = \frac{\rho_{c,0}\Omega_{i,0}a^{-3(1+w_i)}}{\rho_c}
 \end{align*}
@@ -88,7 +88,6 @@ Since the universe takes on scales of many different orders of magnitude, the li
 \begin{equation}
     x = \log{a} \quad \Rightarrow \quad a = \exp{x}
 \end{equation}
-
 The Friedmann equation now reads
 \begin{equation} \label{eqn:Friedmann}
     H(x) = H_0\sqrt{\Omega_{b,0} e^{-3x} + \Omega_\text{{CDM},0}e^{-3x} + \Omega_{r,0}e^{-4x} + \Omega_{\Lambda,0}}
@@ -98,8 +97,9 @@ We also introduce the scaled Hubble parameter $\mathcal{H} = aH = \dot{a}$.
 
 
 \subsection{Conformal time}
-As well as $a$, $x$, and $t$ for measuring time in the universe, we will introduce the conformal time $\eta$. $\eta$ has units of length, and represents the size of the event horizon at any given time. In other words, $\eta$ is the distance traversed by undisturbed light since the Big Bang. Conformal time is also commonly used in units of time, gained by dividing our quantity by $c$, thereby having the interpretation of the time it would take a photon to traverse the universe at that given time (given that the expansion "froze" for the duration of the photons travel).
+As well as $a$, $x$, and $t$ for measuring time in the universe, we will introduce the conformal time $\eta$. $\eta$ has units of length, and represents the size of the event horizon at any given time. In other words, $\eta$ is the distance traversed by undisturbed light since the Big Bang. Conformal time is more commonly used with units of time, which follows from dividing our quantity by $c$, thereby having the interpretation of the time it would take a photon to traverse the universe at that given time (given that the expansion "froze" for the duration of the photons travel).
 
+The conformal time, in units of length, takes on the form
 \begin{equation}
     \eta = \int_0^t \frac{c}{a(t)} \dd{t}
 \end{equation}
@@ -133,18 +133,18 @@ which, inserting into \ref{eqn:eta} gives us the ODE
 \subsection{Analytical solution to conformal time}\label{sec:conf}
 The conformal time integral is not analytically solvable for the complete Hubble parameter, but analytical solutions exist in each of the dominant regimes (radiation, matter, DE). In the radiation dominated regime, $\eta$ takes the form
 \begin{align}
-    \eta_r = \frac{c}{aH_r(a)},  \quad  H_r(a) = \frac{1}{\sqrt{\Omega_r a^{4}}}.
+    \eta_r = \frac{c}{aH_r(a)},  \quad  H_r(a) = H_0\sqrt{\Omega_{r,0} a^{4}}.
 \end{align}
 
 In the matter dominated regime, $\eta$ takes the form
 \begin{align}
-    \eta_m = \eta(a_*) + 2c\qty[\frac{1}{aH_m(a)} - \frac{a_*^{1/2}}{a^{3/2}}], \quad H_m = \frac{1}{\sqrt{(\Omega_m + \Omega_{CDM}) a^3}}.
+    \eta_m = \eta(a_*) + 2c\qty[\frac{1}{aH_m(a)} - \frac{a_*^{1/2}}{a^{3/2}}], \quad H_m = H_0\sqrt{(\Omega_{b,0} + \Omega_{CDM,0}) a^3}.
 \end{align}
 where $a_*$ is some point where $\Omega_m \approx 1$.
 
 In the DE dominated regime, $\eta$ takes the form
 \begin{align}
-    \eta_\Lambda = \eta(a_\Lambda) + \frac{c}{H_\Lambda(a)}\qty[\frac{1}{a_\Lambda} - \frac{1}{a}], \quad H_\Lambda(a) = \frac{1}{\sqrt{\Omega_\Lambda}}.
+    \eta_\Lambda = \eta(a_\Lambda) + \frac{c}{H_\Lambda(a)}\qty[\frac{1}{a_\Lambda} - \frac{1}{a}], \quad H_\Lambda(a) = \sqrt{\Omega_{\Lambda,0}}.
 \end{align}
 where $a_\Lambda$ is some point where $\Omega_\Lambda \approx 1$. The two latter equations require known values of $\eta$ at certain points, preferably deep within their own dominant regime. If only these analytical approximations are available, an extrapolated value of $\eta$ from the previous era would have to be used.
 
@@ -159,18 +159,18 @@ Code for plotting all relevant results are found in \texttt{Python/m1\_plotting.
 
 
 \subsection{Density parameters and the Friedmann equation}
-We find the scaled Hubble parameter $\mathcal{H}$ explicitly from the Friedmann equation \ref{eqn:Friedmann} for $x \in [-27.6, 4.6]$, using density values roughly corresponding to the best estimates of the $\Lambda$CDM model, found in \cite{callin2006}. These are
+We find the scaled Hubble parameter $\mathcal{H}$ explicitly from the Friedmann equation \ref{eqn:Friedmann} for $x \in [-27.6, 4.6]$, using density values roughly corresponding to the best estimates of the $\Lambda$CDM model, found in \cite{callin2006}. More updated values can be found in \cite{Planck2015}, yet we choose the values from the former, for easier comparability. These are
 \begin{align*}
-    \Omega_B &= 0.046 \\
-    \Omega_{CDM} &= 0.224
+    \Omega_{b,0} &= 0.046 \\
+    \Omega_{CDM,0} &= 0.224
 \end{align*}
-while $\Omega_r$ is directly calculated from today's observed temperature of the CMB, at $T_{CMB} = \SI{2.725}{K}$, as
+while $\Omega_{r,0}$ is directly calculated from today's observed temperature of the CMB, at $T_{CMB,0} = \SI{2.725}{K}$, as
 \begin{align*}
-    \Omega_r = \frac{\pi^2}{15}\frac{\qty(k_bT_{CMB})^4}{\hbar^3c^5}\frac{8\pi G}{3H_0^2} = 5.043 \times 10^{-5}.
+    \Omega_{r,0} = \frac{\pi^2}{15}\frac{\qty(k_bT_{CMB,0})^4}{\hbar^3c^5}\frac{8\pi G}{3H_0^2} = 5.043 \times 10^{-5}.
 \end{align*}
 Equation \ref{eqn:sum1} constrains $\Omega_\Lambda$ to
 \begin{align*}
-    \Omega_{\Lambda} &= 1 - \qty(\Omega_R + \Omega_{CDM} + \Omega_m) = 0.72995
+    \Omega_{\Lambda,0} &= 1 - \qty(\Omega_R + \Omega_{CDM} + \Omega_m) = 0.72995
 \end{align*}
 Using the Hubble parameter, we calculate the relative densities of all components from equation \ref{eqn:Omegas}.
 
@@ -188,7 +188,7 @@ Figure \ref{fig:H} shows the evolution of conformal time and the Hubble paramete
 The scaled Hubble parameter also shows three regimes of exponential dependence on $x$, although instead of leveling out, the DE regime shows it increasing. Since $\mathcal{H} = \dot{a}$, this regime has the universes expansion accelerating, while the radiation and matter dominated regimes have the expansion slowing down.
 
 \subsection{Relative densities}
-Figure \ref{fig:Omegas} shows the distribution of relative densities over time. We observe that the very early universe is completely radiation dominated, which gradually evolves into matter domination, the turnover point being at $x\approx-8.7$, or $z\approx 6000$. At $x\approx-3$, the universe energy content comes almost exclusively from baryons and CDM. This quickly changes into dark energy domination, at $x\approx -0.28$, or $z\approx 0.33$, which is the era we're in today. We also observe that the total relative density sums perfectly to 1 at all times.
+Figure \ref{fig:Omegas} shows the distribution of relative densities over time. We observe that the very early universe is completely radiation dominated, which gradually evolves into matter domination, the turnover point being at $x\approx-8.6$, or $z\approx 5350$. At $x\approx-3$, the universe energy content comes almost exclusively from baryons and CDM. This quickly transitions into the dark energy domination, at $x\approx -0.32$, or $z\approx 0.39$, which is the era we're in today. We also observe that the total relative density sums perfectly to 1 at all times.
 
 
 \begin{figure}[H]
