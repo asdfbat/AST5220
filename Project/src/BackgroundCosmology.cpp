@@ -84,22 +84,28 @@ double BackgroundCosmology::Hp_of_x(double x) const{
 
 
 double BackgroundCosmology::dHpdx_of_x(double x) const{
-  //=============================================================================
-  // TODO: Implement...
-  //=============================================================================
-  //...
-  //...
-  return 0.0;
+  double exp_m1 = exp(-x);
+  double exp_m2 = exp(-2*x);
+  double exp_p2 = exp(2*x);
+
+  double Omega_M = OmegaCDM + OmegaB;
+  double Omega_sum1 = -Omega_M*exp_m1 - 2*OmegaR*exp_m2 + 2*OmegaLambda*exp_p2;
+  double Omega_sum2 = Omega_M*exp_m1 + OmegaR*exp_m2 + OmegaLambda*exp_p2;
+  return get_H0()*Omega_sum1/(2*sqrt(Omega_sum2));
 }
 
 
 double BackgroundCosmology::ddHpddx_of_x(double x) const{
-  //=============================================================================
-  // TODO: Implement...
-  //=============================================================================
-  //...
-  //...
-  return 0.0;
+  double exp_m1 = exp(-x);
+  double exp_m2 = exp(-2*x);
+  double exp_p2 = exp(2*x);
+
+  double Omega_M = OmegaCDM + OmegaB;
+  double Omega_sum1 = -Omega_M*exp_m1 - 2*OmegaR*exp_m2 + 2*OmegaLambda*exp_p2;
+  double Omega_sum2 = Omega_M*exp_m1 + OmegaR*exp_m2 + OmegaLambda*exp_p2;
+  double Omega_sum3 = Omega_M*exp_m1 + 4*OmegaR*exp_m2 + 4*OmegaLambda*exp_p2;
+
+  return get_H0()*( Omega_sum3/(2*sqrt(Omega_sum2)) - (Omega_sum1*Omega_sum1)/(4*sqrt(Omega_sum2*Omega_sum2*Omega_sum2)) );
 }
 
 
@@ -196,6 +202,7 @@ void BackgroundCosmology::output(const std::string filename) const{
     fp << get_OmegaR(x)      << " ";  // 7
     fp << get_OmegaNu(x)     << " ";  // 8
     fp << get_OmegaK(x)      << " ";  // 9
+    fp << ddHpddx_of_x(x)    << " ";  // 10
     fp <<"\n";
   };
   std::for_each(x_array.begin(), x_array.end(), print_data);

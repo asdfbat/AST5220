@@ -14,10 +14,15 @@ Hp_of_x_SI = data[:,2]                              # aH(x) in SI
 Hp_of_x = Hp_of_x_SI/Constants.km*Constants.Mpc     # aH(x) in km/s/Mpc
 H_of_x_SI = Hp_of_x_SI/np.exp(x)                    # H(x) in SI  
 H_of_x = Hp_of_x/np.exp(x)                          # H(x) in km/s/Mpc
+dHpdx_of_x_SI = data[:,3]
+ddHpddx_of_x_SI = data[:,10]
+dHpdx_of_x = dHpdx_of_x_SI/Constants.km*Constants.Mpc
+ddHpddx_of_x = ddHpddx_of_x_SI/Constants.km*Constants.Mpc
 OmegaB = data[:,4]
 OmegaCDM = data[:,5]
 OmegaLambda = data[:,6]
 OmegaR = data[:,7]
+
 
 a = np.exp(x)
 z = 1/a - 1
@@ -180,4 +185,14 @@ ax[1,1].set_title(r"$H(z)$")
 
 fig.tight_layout()
 fig.savefig("../m1_figs/H.pdf", bbox_inches="tight")
+plt.close(fig)
+
+
+fig, ax = plt.subplots(1, 2, figsize=(13.5, 5))
+ax[0].plot(x, dHpdx_of_x_SI/Hp_of_x_SI)
+ax[0].set_ylabel(r"$\mathcal{H}'/\mathcal{H}$")
+ax[1].plot(x, ddHpddx_of_x_SI/Hp_of_x_SI)
+ax[1].set_ylabel(r"$\mathcal{H}''/\mathcal{H}$")
+fig.tight_layout()
+fig.savefig("../m1_figs/H_derivatives.pdf", bbox_inches="tight")
 plt.close(fig)
