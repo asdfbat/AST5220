@@ -101,8 +101,8 @@ void RecombinationHistory::solve_number_density_electrons(){
   //...
   Vector Xe_log_arr(npts_rec_arrays);
   for(int i=0; i<npts_rec_arrays; i++){
-    if(Xe_arr[i] < 1e-10){
-      Xe_log_arr[i] = -10;
+    if(Xe_arr[i] < exp(-16)){
+      Xe_log_arr[i] = -16;
     }
     else{
       Xe_log_arr[i] = log(Xe_arr[i]);
