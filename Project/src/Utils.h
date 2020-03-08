@@ -47,9 +47,13 @@ extern struct ConstantsAndUnits {
   const double k_min = 0.00005 / Mpc;
   const double k_max = 0.3     / Mpc;
   
-  // Min and max x-value
-  const double x_start = log(1e-8);
-  const double x_end   = 0.0;
+  // Min and max x-value for solvers.
+  const double x_start_solve = -24;
+  const double x_end_solve   = 6.0;
+
+  // Min and max x-value for writing to file. Smaller than solve to avoid edge/initial condition effects.
+  const double x_start = -16;
+  const double x_end   = 4.0;
 
   // Include polarization and/or neutrinos?
   const bool polarization  = true;

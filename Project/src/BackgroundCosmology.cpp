@@ -32,10 +32,10 @@ void BackgroundCosmology::solve(){
   Utils::StartTiming("Eta");
     
   int npts = 100000;
-  double a_start = 1e-12;
-  double a_stop = 1e2;
-  double x_start = log(a_start);
-  double x_stop = log(a_stop);
+  double x_start = Constants.x_start_solve;
+  double x_stop = Constants.x_end_solve;
+  double a_start = exp(x_start);
+  double a_stop = exp(x_stop);
   printf("Solving conformal time for x in [%f, %f]\n", x_start, x_stop);
 
   Vector x_array = Utils::linspace(x_start, x_stop, npts);
@@ -189,8 +189,8 @@ void BackgroundCosmology::info() const{
 // Output some data to file
 //====================================================
 void BackgroundCosmology::output(const std::string filename) const{
-  const double x_min = -15.0;
-  const double x_max =  4.0;
+  const double x_min =  x_start;
+  const double x_max =  x_end;
   const int    n_pts =  10000;
   
   Vector x_array = Utils::linspace(x_min, x_max, n_pts);
