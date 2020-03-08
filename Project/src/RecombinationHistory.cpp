@@ -119,6 +119,12 @@ std::pair<double,double> RecombinationHistory::electron_fraction_from_saha_equat
   //const double OmegaB      = cosmo->get_OmegaB();
   //...
   //...
+  const double OmegaB = cosmo->get_OmegaB(x);
+  const double rho_c  = cosmo->get_rho_crit();
+  const double T_b    = cosmo->get_TCMB();  // Assuming T_b = T_CMB to be a good approximation.
+  
+  const double n_b    = OmegaB*rho_c/(m_H*a*a*a);
+  const double n_H    = n_b;
 
   // Electron fraction and number density
   double Xe = 0.0;
@@ -129,6 +135,9 @@ std::pair<double,double> RecombinationHistory::electron_fraction_from_saha_equat
   //=============================================================================
   //...
   //...
+  double A = 1/(n_b*hbar*hbar*hbar) * pow((m_e*k_b*T_b)/(2*M_PI), 1.5) * exp(-epsilon_0/(k_b*T_b));
+  Xe = -A/2 + A/2*sqrt(1 + 4/A);
+  ne = Xe*n_H;
 
   return std::pair<double,double>(Xe, ne);
 }

@@ -33,7 +33,7 @@ int main(int argc, char **argv){
   cosmo.output("../data/cosmology.txt");
 
   // Remove when module is completed
-  return 0;
+  // return 0;
 
   //=========================================================================
   // Module II
