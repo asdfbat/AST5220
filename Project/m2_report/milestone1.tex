@@ -199,18 +199,23 @@ The correct expression for $\beta$ is then
 
 
 \subsection{Solving the Saha equation}
-The Saha equation \ref{eqn:Saha} is actually analytically solvable. Multiplying by $(1-X_e)$ on both sides gives us
+The Saha equation \ref{eqn:Saha} is actually analytically solvable. Multiplying by $(1-X_e)$ on both sides and reshuffling gives us
 \begin{equation*}
-    X_e^2 = (1-X_e)A \quad \Rightarrow \quad X_e^2 + AX_e - A = 0
+    \frac{X_e^2}{(1-X_e)} = A \quad \Rightarrow \quad X_e^2 + AX_e - A = 0
 \end{equation*}
 which is simply a second order equation in $X_e$, with solutions
 \begin{equation*}
     X_e = - \frac{A}{2} \pm \frac{1}{2}\qty(A^2 + 4A)^{1/2}
 \end{equation*}
 The free electron fraction can't physically be negative. The positive solution reads
-\begin{equation*}
+\begin{equation}\label{eqn:Saha_sol}
     X_e = - \frac{A}{2} + \frac{A}{2}\qty(1 + \frac{4}{A})^{1/2}
-\end{equation*}
+\end{equation}
+
+We can also observe from \ref{eqn:Saha} that, as $X_e \rightarrow 1$, A will quickly converge towards zero as $A \propto X_e^2$. This will present a problem for equation \ref{eqn:Saha_sol}, as the $\frac{4}{A}$ term will diverge to infinity.
+
+At the other end, as $X_e \rightarrow 1$, A will diverge to infinity, as $A \propto X_e^{-1}$.
+
 
 \bibliography{ref}
 \bibliographystyle{plain}
