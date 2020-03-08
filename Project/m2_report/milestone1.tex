@@ -85,8 +85,8 @@ We need a combination of $\hbar$, $c$ and $k_B$ which removes these dimensions.
     [A][k_B^{3/2}] = L^6M^3t^{-3}
 \end{equation*}
 We immediately recognize this as the units of $\hbar^3$, meaning that multiplying by the factor of $\hbar^{-3}$ will make A a unitless quantity. The Saha expression with all relevant constants then reads
-\begin{equation}
-    \frac{X_{e}^{2}}{1-X_{e}} = \frac{1}{n_{b}\hbar^3}\qty(\frac{m_{e} k_B T_{b}}{2 \pi})^{3 / 2} e^{-\epsilon_{0} / k_B T_{b}}
+\begin{equation}\label{eqn:Saha}
+    \frac{X_{e}^{2}}{1-X_{e}} = A\ , \quad A = \frac{1}{n_{b}\hbar^3}\qty(\frac{m_{e} k_B T_{b}}{2 \pi})^{3 / 2} e^{-\epsilon_{0} / k_B T_{b}}
 \end{equation}
 
 
@@ -197,6 +197,20 @@ The correct expression for $\beta$ is then
     \beta\qty(T_{b}) =\frac{\alpha^{(2)}\qty(T_{b})}{\hbar^3}\qty(\frac{m_{e} k_B T_{b}}{2 \pi})^{3 / 2} e^{-\epsilon_{0} / k_BT_{b}}
 \end{equation*}
 
+
+\subsection{Solving the Saha equation}
+The Saha equation \ref{eqn:Saha} is actually analytically solvable. Multiplying by $(1-X_e)$ on both sides gives us
+\begin{equation*}
+    X_e^2 = (1-X_e)A \quad \Rightarrow \quad X_e^2 + AX_e - A = 0
+\end{equation*}
+which is simply a second order equation in $X_e$, with solutions
+\begin{equation*}
+    X_e = - \frac{A}{2} \pm \frac{1}{2}\qty(A^2 + 4A)^{1/2}
+\end{equation*}
+The free electron fraction can't physically be negative. The positive solution reads
+\begin{equation*}
+    X_e = - \frac{A}{2} + \frac{A}{2}\qty(1 + \frac{4}{A})^{1/2}
+\end{equation*}
 
 \bibliography{ref}
 \bibliographystyle{plain}
