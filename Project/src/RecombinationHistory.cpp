@@ -54,8 +54,7 @@ void RecombinationHistory::solve_number_density_electrons(){
 
     // Are we still in the Saha regime?
     if(Xe_current < Xe_saha_limit)
-      // saha_regime = false;
-      saha_regime = true;
+      saha_regime = false;
 
     if(saha_regime){
       
@@ -66,7 +65,6 @@ void RecombinationHistory::solve_number_density_electrons(){
       //...
       Xe_arr[i] = Xe_current;
       ne_arr[i] = ne_current;
-
     } else {
 
       //==============================================================
@@ -89,7 +87,33 @@ void RecombinationHistory::solve_number_density_electrons(){
       //=============================================================================
       //...
       //...
-    
+      int remaining_indices = npts_rec_arrays - i;
+      Vector x_array_Peebles(remaining_indices);
+      for(int j=0; j<remaining_indices; j++){
+        x_array_Peebles[j] = x_array[j+i];
+      }
+      Vector Xe_inc = {Xe_current};
+
+      ODESolver ode;
+      ode.solve(dXedx, x_array_Peebles, Xe_inc);
+
+      Vector Xe_Peebles = ode.get_data_by_component(0);
+      // for(int j=0; j<remaining_indices; j++){
+      //   printf("%e\n", Xe_Peebles[j]);
+      // }
+
+      const double OmegaB = cosmo->get_OmegaB();
+      const double rho_c  = cosmo->get_rho_crit();
+      const double m_H    = Constants.m_H;
+      
+      for(int j=0; j<remaining_indices; j++){
+        Xe_arr[j+i] = Xe_Peebles[j];
+        double a = exp(x_array_Peebles[j]);
+        double n_H = OmegaB*rho_c/(m_H*a*a*a);
+        ne_arr[j+i] = Xe_arr[j]*n_H;
+      }
+
+      break;
     }
   }
 
@@ -101,13 +125,13 @@ void RecombinationHistory::solve_number_density_electrons(){
   //...
   Vector Xe_log_arr(npts_rec_arrays);
   for(int i=0; i<npts_rec_arrays; i++){
+    // printf("%e\n", Xe_arr[i]);
     if(Xe_arr[i] < exp(-16)){
       Xe_log_arr[i] = -16;
     }
     else{
       Xe_log_arr[i] = log(Xe_arr[i]);
     }
-    // printf("%f\n", Xe_log_arr[i]);
   }
 
   log_Xe_of_x_spline.create(x_array, Xe_log_arr);
@@ -204,6 +228,28 @@ int RecombinationHistory::rhs_peebles_ode(double x, const double *Xe, double *dX
   // const double OmegaB      = cosmo->get_OmegaB();
   // ...
   // ...
+  const double OmegaB    = cosmo->get_OmegaB();
+  const double T_b       = cosmo->get_TCMB()/a;
+  const double rho_c     = cosmo->get_rho_crit();
+  const double H         = cosmo->H_of_x(x);
+  const double n_H = OmegaB*rho_c/(Constants.m_H*a*a*a);
+
+  // Commonly used combination of units, predifed for speed and prevention of loss of numerical precision.
+  const double c_hbar     = c*hbar;
+  const double ep0_c_hbar = epsilon_0/c_hbar;
+  const double kb_Tb      = k_b*T_b;
+  const double ep0_kb_Tb  = epsilon_0/kb_Tb;
+
+  // Expression in the Peebles RHS equation.
+  const double phi_2         = 0.448*log(ep0_kb_Tb);
+  const double n_1s          = (1 - X_e)*n_H;
+  const double Lambda_alpha = H*27*ep0_c_hbar*ep0_c_hbar*ep0_c_hbar/(64*M_PI*M_PI*n_1s);
+  const double Lambda_2s1s  = 8.227;
+  const double alpha_2      = 8/sqrt(3*M_PI)*sigma_T*c*sqrt(ep0_kb_Tb)*phi_2;
+  const double beta         = alpha_2*pow((m_e*kb_Tb/(2*M_PI*hbar*hbar)), 1.5)*exp(-ep0_kb_Tb);
+  const double beta_2       = beta*exp(3/4*ep0_kb_Tb);
+  const double Cr           = (Lambda_2s1s + Lambda_alpha)/(Lambda_2s1s + Lambda_alpha + beta_2);
+
 
   //=============================================================================
   // TODO: Write the expression for dXedx
@@ -211,8 +257,10 @@ int RecombinationHistory::rhs_peebles_ode(double x, const double *Xe, double *dX
   //...
   //...
   
-  dXedx[0] = 0.0;
+  dXedx[0] = Cr/H*(beta*(1 - X_e) - n_H*alpha_2*X_e*X_e);
 
+  // printf("%e %e %e %e %e %e %e %e\n", X_e, Cr, H, n_H, alpha_2, beta, beta_2, phi_2);
+  printf("%e %e %e %e %e %e\n", x, Xe[0], dXedx[0], Cr/H, beta*(1 - X_e), n_H*alpha_2*X_e*X_e);
   return GSL_SUCCESS;
 }
 
