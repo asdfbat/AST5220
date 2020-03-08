@@ -17,6 +17,7 @@ BackgroundCosmology::BackgroundCosmology(
   TCMB(TCMB)
 {
   H0 = Constants.H0_over_h*h;
+  rho_c = 3*H0*H0/(8*M_PI*Constants.G);
   OmegaR = pow(M_PI, 2)/15.0*pow(Constants.k_b*TCMB, 4)/(pow(Constants.hbar, 3)*pow(Constants.c, 5))*8*M_PI*Constants.G/(3*H0*H0);
   OmegaLambda = 1 - OmegaR - OmegaB - OmegaCDM;
   OmegaNu = 0;
@@ -160,6 +161,10 @@ double BackgroundCosmology::get_Neff() const{
 
 double BackgroundCosmology::get_TCMB() const{ 
   return TCMB; 
+}
+
+double BackgroundCosmology::get_rho_crit() const{
+  return rho_c;
 }
 
 //====================================================
