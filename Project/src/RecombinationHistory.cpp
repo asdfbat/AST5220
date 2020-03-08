@@ -34,9 +34,9 @@ void RecombinationHistory::solve_number_density_electrons(){
   //=============================================================================
   // TODO: Set up x-array and make arrays to store X_e(x) and n_e(x) on
   //=============================================================================
-  Vector x_array;
-  Vector Xe_arr;
-  Vector ne_arr;
+  Vector x_array = Utils::linspace(Constants.x_start, Constants.x_end, npts_rec_arrays);
+  Vector Xe_arr(npts_rec_arrays);
+  Vector ne_arr(npts_rec_arrays);
 
   // Calculate recombination history
   bool saha_regime = true;
@@ -54,7 +54,8 @@ void RecombinationHistory::solve_number_density_electrons(){
 
     // Are we still in the Saha regime?
     if(Xe_current < Xe_saha_limit)
-      saha_regime = false;
+      // saha_regime = false;
+      saha_regime = true;
 
     if(saha_regime){
       
@@ -63,6 +64,8 @@ void RecombinationHistory::solve_number_density_electrons(){
       //=============================================================================
       //...
       //...
+      Xe_arr[i] = Xe_current;
+      ne_arr[i] = ne_current;
 
     } else {
 
