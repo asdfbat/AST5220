@@ -99,6 +99,20 @@ void RecombinationHistory::solve_number_density_electrons(){
   //=============================================================================
   //...
   //...
+  Vector Xe_log_arr(npts_rec_arrays);
+  for(int i=0; i<npts_rec_arrays; i++){
+    if(Xe_arr[i] < 1e-10){
+      Xe_log_arr[i] = -10;
+    }
+    else{
+      Xe_log_arr[i] = log(Xe_arr[i]);
+    }
+    // printf("%f\n", Xe_log_arr[i]);
+  }
+
+  log_Xe_of_x_spline.create(x_array, Xe_log_arr);
+  tau_of_x_spline.create(x_array, x_array); //PLACEHODLER: WRONG!
+  g_tilde_of_x_spline.create(x_array, x_array); //PLACEHOLDER: WRONG!
 
   Utils::EndTiming("Xe");
 }
@@ -124,7 +138,7 @@ std::pair<double,double> RecombinationHistory::electron_fraction_from_saha_equat
   //...
   const double OmegaB = cosmo->get_OmegaB(x);
   const double rho_c  = cosmo->get_rho_crit();
-  const double T_b    = cosmo->get_TCMB();  // Assuming T_b = T_CMB to be a good approximation.
+  const double T_b    = cosmo->get_TCMB()/a;  // Assuming T_b = T_CMB/a to be a good approximation.
   
   const double n_b    = OmegaB*rho_c/(m_H*a*a*a);
   const double n_H    = n_b;
@@ -138,9 +152,30 @@ std::pair<double,double> RecombinationHistory::electron_fraction_from_saha_equat
   //=============================================================================
   //...
   //...
-  double A = 1/(n_b*hbar*hbar*hbar) * pow((m_e*k_b*T_b)/(2*M_PI), 1.5) * exp(-epsilon_0/(k_b*T_b));
-  Xe = -A/2 + A/2*sqrt(1 + 4/A);
+
+  // double log_n_b  = log(n_b);
+  // double log_m_e  = log(m_e);
+  // double log_k_b  = log(k_b);
+  // double log_T_b  = log(T_b);
+  // double log_hbar = log(hbar);
+
+  // double log_A = 
+
+
+  double A = 1/(n_b) * pow((m_e*k_b*T_b)/(2*M_PI*hbar*hbar), 1.5) * exp(-epsilon_0/(k_b*T_b));
+
+  if(A < 1e-12){
+    Xe = 0;
+  }
+  else if(A > 1e8){
+    Xe = 1;
+  }
+  else{
+    Xe = -A/2 + A/2*sqrt(1 + 4/A);
+  }
   ne = Xe*n_H;
+
+  // printf("%e %e\n", A, Xe);
 
   return std::pair<double,double>(Xe, ne);
 }
@@ -287,8 +322,8 @@ double RecombinationHistory::Xe_of_x(double x) const{
   //=============================================================================
   //...
   //...
-
-  return 0.0;
+  double log_Xe_of_x = log_Xe_of_x_spline(x);
+  return exp(log_Xe_of_x);
 }
 
 double RecombinationHistory::ne_of_x(double x) const{
@@ -298,8 +333,12 @@ double RecombinationHistory::ne_of_x(double x) const{
   //=============================================================================
   //...
   //...
-
-  return 0.0;
+  //...
+  double OmegaB = cosmo->get_OmegaB(x);
+  double rho_c  = cosmo->get_rho_crit();
+  double a = exp(x);
+  const double n_H = OmegaB*rho_c/(Constants.m_H*a*a*a);
+  return Xe_of_x(x)*n_H;
 }
 
 double RecombinationHistory::get_Yp() const{
@@ -327,15 +366,15 @@ void RecombinationHistory::output(const std::string filename) const{
 
   Vector x_array = Utils::linspace(x_min, x_max, npts);
   auto print_data = [&] (const double x) {
-    fp << x                    << " ";
-    fp << Xe_of_x(x)           << " ";
-    fp << ne_of_x(x)           << " ";
-    fp << tau_of_x(x)          << " ";
-    fp << dtaudx_of_x(x)       << " ";
-    fp << ddtauddx_of_x(x)     << " ";
-    fp << g_tilde_of_x(x)      << " ";
-    fp << dgdx_tilde_of_x(x)   << " ";
-    fp << ddgddx_tilde_of_x(x) << " ";
+    fp << x                    << " ";  // 0
+    fp << Xe_of_x(x)           << " ";  // 1
+    fp << ne_of_x(x)           << " ";  // 2
+    fp << tau_of_x(x)          << " ";  // 3
+    fp << dtaudx_of_x(x)       << " ";  // 4
+    fp << ddtauddx_of_x(x)     << " ";  // 5
+    fp << g_tilde_of_x(x)      << " ";  // 6
+    fp << dgdx_tilde_of_x(x)   << " ";  // 7
+    fp << ddgddx_tilde_of_x(x) << " ";  // 8
     fp << "\n";
   };
   std::for_each(x_array.begin(), x_array.end(), print_data);

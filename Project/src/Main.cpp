@@ -41,10 +41,11 @@ int main(int argc, char **argv){
   
   // Solve the recombination history
   RecombinationHistory rec(&cosmo, Yp);
+  rec.solve();
   rec.info();
 
   // Output recombination quantities
-  rec.output("recombination.txt");
+  rec.output("../data/recombination.txt");
   
   // Remove when module is completed
   return 0;
