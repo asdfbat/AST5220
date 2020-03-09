@@ -123,10 +123,10 @@ void RecombinationHistory::solve_number_density_electrons(){
   //=============================================================================
   //...
   //...
+  // Log(Xe) behaves more smoothly in x, so we spline the log, and simply exp it when we need it.
   Vector Xe_log_arr(npts_rec_arrays);
   for(int i=0; i<npts_rec_arrays; i++){
-    // printf("%e\n", Xe_arr[i]);
-    if(Xe_arr[i] < exp(-20)){
+    if(Xe_arr[i] < exp(-20)){  // Setting a lower bound on Xe, as log(0)=-inf.
       Xe_log_arr[i] = -20;
     }
     else{
@@ -188,8 +188,8 @@ std::pair<double,double> RecombinationHistory::electron_fraction_from_saha_equat
 
   double A = 1/(n_b) * pow((m_e*k_b*T_b)/(2*M_PI*hbar*hbar), 1.5) * exp(-epsilon_0/(k_b*T_b));
 
-  if(A < 1e-30){
-    Xe = 0;
+  if(A < 1e-30){  // The solution to Xe becomes numerically unstable for large and small A,
+    Xe = 0;       // so we hardcode the asymptotic solutions in each direction.
   }
   else if(A > 1e12){
     Xe = 1;
