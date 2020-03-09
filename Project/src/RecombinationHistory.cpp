@@ -126,8 +126,8 @@ void RecombinationHistory::solve_number_density_electrons(){
   Vector Xe_log_arr(npts_rec_arrays);
   for(int i=0; i<npts_rec_arrays; i++){
     // printf("%e\n", Xe_arr[i]);
-    if(Xe_arr[i] < exp(-16)){
-      Xe_log_arr[i] = -16;
+    if(Xe_arr[i] < exp(-20)){
+      Xe_log_arr[i] = -20;
     }
     else{
       Xe_log_arr[i] = log(Xe_arr[i]);
@@ -188,10 +188,10 @@ std::pair<double,double> RecombinationHistory::electron_fraction_from_saha_equat
 
   double A = 1/(n_b) * pow((m_e*k_b*T_b)/(2*M_PI*hbar*hbar), 1.5) * exp(-epsilon_0/(k_b*T_b));
 
-  if(A < 1e-12){
+  if(A < 1e-30){
     Xe = 0;
   }
-  else if(A > 1e8){
+  else if(A > 1e12){
     Xe = 1;
   }
   else{
@@ -260,7 +260,7 @@ int RecombinationHistory::rhs_peebles_ode(double x, const double *Xe, double *dX
   dXedx[0] = Cr/H*(beta*(1 - X_e) - n_H*alpha_2*X_e*X_e);
 
   // printf("%e %e %e %e %e %e %e %e\n", X_e, Cr, H, n_H, alpha_2, beta, beta_2, phi_2);
-  printf("%e %e %e %e %e %e\n", x, Xe[0], dXedx[0], Cr/H, beta*(1 - X_e), n_H*alpha_2*X_e*X_e);
+  // printf("%e %e %e %e %e %e\n", x, Xe[0], dXedx[0], Cr/H, beta*(1 - X_e), n_H*alpha_2*X_e*X_e);
   return GSL_SUCCESS;
 }
 
@@ -392,6 +392,12 @@ double RecombinationHistory::ne_of_x(double x) const{
 double RecombinationHistory::get_Yp() const{
   return Yp;
 }
+
+void RecombinationHistory::set_saha_limit(double saha_limit){
+  // Function for setting the Saha limit to something else than the default 0.99.
+  Xe_saha_limit = saha_limit;
+}
+
 
 //====================================================
 // Print some useful info about the class

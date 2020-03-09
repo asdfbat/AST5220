@@ -26,7 +26,7 @@ class RecombinationHistory{
     const int npts_rec_arrays = 40000;
   
     // Xe for when to switch between Saha and Peebles
-    const double Xe_saha_limit = 0.99;
+    double Xe_saha_limit = 0.99;
 
     //===============================================================
     // [1] Computation of Xe (Saha and Peebles equation)
@@ -80,6 +80,7 @@ class RecombinationHistory{
     double Xe_of_x(double x) const;
     double ne_of_x(double x) const;
     double get_Yp() const;
+    void set_saha_limit(double saha_limit);
 };
 
 #endif
