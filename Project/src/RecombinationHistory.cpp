@@ -260,13 +260,13 @@ int RecombinationHistory::rhs_peebles_ode(double x, const double *Xe, double *dX
   // [6.0900e-20 - 9.3257e-26]   [3.5794e+01 - 2.3375e+07]
 
 
-  static bool asdf = true;
-  if(asdf){
-    printf("%10s  %10s  %10s  %10s  %10s  %10s  %10s  %10s\n", "x", "Tb", "alpha2", "ep0_kb_Tb", "phi2", "beta", "beta_2", "beta_22");
-    asdf=false;
-  }
+  // static bool asdf = true;
+  // if(asdf){
+  //   printf("%10s  %10s  %10s  %10s  %10s  %10s  %10s  %10s\n", "x", "Tb", "alpha2", "ep0_kb_Tb", "phi2", "beta", "beta_2", "beta_22");
+  //   asdf=false;
+  // }
 
-  printf("%10.4e  %10.4e  %10.4e  %10.4e  %10.4e  %10.4e,  %10.4e  %10.4e  %10.4e  %10.4e\n", x, (double) ep0_kb_Tb, (double) alpha_2, (double) ep0_kb_Tb, (double) phi_2, (double) beta, (double) beta_2, (double) beta_22, (double) alpha_2*pow((m_e*kb_Tb/(2*M_PI*hbar*hbar)), 1.5), (double) exp(-1/4*ep0_kb_Tb));
+  // printf("%10.4e  %10.4e  %10.4e  %10.4e  %10.4e  %10.4e,  %10.4e  %10.4e  %10.4e  %10.4e\n", x, (double) ep0_kb_Tb, (double) alpha_2, (double) ep0_kb_Tb, (double) phi_2, (double) beta, (double) beta_2, (double) beta_22, (double) alpha_2*pow((m_e*kb_Tb/(2*M_PI*hbar*hbar)), 1.5), (double) exp(-1/4*ep0_kb_Tb));
 
   //=============================================================================
   // TODO: Write the expression for dXedx
@@ -328,16 +328,18 @@ void RecombinationHistory::solve_for_optical_depth_tau(){
   ODESolver ode;
   ode.solve(dtaudx, x_array, tau_inc);
   Vector tau_arr = ode.get_data_by_component(0);
-  // Vector tau_dx_arr = ode.get_data_by_component(1);
+  Vector dtaudx_arr = ode.get_derivative_data_by_component(0);
 
-  // for(int i=0;)
 
   double tau_0 = tau_arr[x0_index];
   for(int i=0; i<npts; i++){
     tau_arr[i] -= tau_0;
+    if(i%100 == 0)
+    printf("%e\n", dtaudx_arr[i]);
   }
 
   tau_of_x_spline.create(x_array, tau_arr);
+  dtaudx_of_x_spline.create(x_array, dtaudx_arr);
   //=============================================================================
   // TODO: Compute visibility functions and spline everything
   //=============================================================================
@@ -364,7 +366,7 @@ double RecombinationHistory::dtaudx_of_x(double x) const{
   //...
   //...
 
-  return 0.0;
+  return dtaudx_of_x_spline(x);
 }
 
 double RecombinationHistory::ddtauddx_of_x(double x) const{
@@ -375,7 +377,7 @@ double RecombinationHistory::ddtauddx_of_x(double x) const{
   //...
   //...
 
-  return 0.0;
+  return dtaudx_of_x_spline.deriv_x(x);
 }
 
 double RecombinationHistory::g_tilde_of_x(double x) const{
