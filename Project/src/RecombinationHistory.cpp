@@ -138,7 +138,7 @@ void RecombinationHistory::solve_number_density_electrons(){
 
   log_Xe_of_x_spline.create(x_array, Xe_log_arr);
   // tau_of_x_spline.create(x_array, x_array); //PLACEHODLER: WRONG!
-  g_tilde_of_x_spline.create(x_array, x_array); //PLACEHOLDER: WRONG!
+  // g_tilde_of_x_spline.create(x_array, x_array); //PLACEHOLDER: WRONG!
 
   Utils::EndTiming("Xe");
 }
@@ -334,10 +334,8 @@ void RecombinationHistory::solve_for_optical_depth_tau(){
   double tau_0 = tau_arr[x0_index];
   for(int i=0; i<npts; i++){
     tau_arr[i] -= tau_0;
-    if(i%100 == 0)
-    printf("%e\n", dtaudx_arr[i]);
   }
-
+  
   tau_of_x_spline.create(x_array, tau_arr);
   dtaudx_of_x_spline.create(x_array, dtaudx_arr);
   //=============================================================================
@@ -345,6 +343,11 @@ void RecombinationHistory::solve_for_optical_depth_tau(){
   //=============================================================================
   //...
   //...
+  Vector g_arr(npts);
+  for(int i=0; i<npts; i++){
+    g_arr[i] = -dtaudx_arr[i]*exp(-tau_arr[i]);
+  }
+  g_tilde_of_x_spline.create(x_array, g_arr);
 
   Utils::EndTiming("opticaldepth");
 }
@@ -392,7 +395,7 @@ double RecombinationHistory::dgdx_tilde_of_x(double x) const{
   //...
   //...
 
-  return 0.0;
+  return g_tilde_of_x_spline.deriv_x(x);
 }
 
 double RecombinationHistory::ddgddx_tilde_of_x(double x) const{
@@ -403,7 +406,7 @@ double RecombinationHistory::ddgddx_tilde_of_x(double x) const{
   //...
   //...
 
-  return 0.0;
+  return g_tilde_of_x_spline.deriv_xx(x);
 }
 
 double RecombinationHistory::Xe_of_x(double x) const{
