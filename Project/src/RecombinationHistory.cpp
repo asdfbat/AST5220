@@ -34,8 +34,6 @@ void RecombinationHistory::solve_number_density_electrons(){
   //=============================================================================
   // TODO: Set up x-array and make arrays to store X_e(x) and n_e(x) on
   //=============================================================================
-  const int x_start = -16;
-  const int x_end = 6;
   Vector x_array = Utils::linspace(x_start, x_end, npts_rec_arrays);
   Vector Xe_arr(npts_rec_arrays);
   Vector ne_arr(npts_rec_arrays);
@@ -100,9 +98,6 @@ void RecombinationHistory::solve_number_density_electrons(){
       ode.solve(dXedx, x_array_Peebles, Xe_inc);
 
       Vector Xe_Peebles = ode.get_data_by_component(0);
-      // for(int j=0; j<remaining_indices; j++){
-      //   printf("%f %e\n", x_array[i+j], Xe_Peebles[j]);
-      // }
 
       const double OmegaB = cosmo->get_OmegaB();
       const double rho_c  = cosmo->get_rho_crit();
@@ -250,7 +245,7 @@ int RecombinationHistory::rhs_peebles_ode(double x, const double *Xe, double *dX
   const long double alpha_2      = 8/sqrt(3*M_PI)*sigma_T*c*sqrt(ep0_kb_Tb)*phi_2;
   const long double beta         = alpha_2*pow((m_e*kb_Tb/(2*M_PI*hbar*hbar)), 1.5)*exp(-ep0_kb_Tb);
   const long double beta_2       = alpha_2*pow((m_e*kb_Tb/(2*M_PI*hbar*hbar)), 1.5)*exp(-0.25*ep0_kb_Tb);
-  const long double beta_22      = beta*exp(0.75*ep0_kb_Tb);
+  // const long double beta_22      = beta*exp(0.75*ep0_kb_Tb);
   const long double Cr           = (Lambda_2s1s + Lambda_alpha)/(Lambda_2s1s + Lambda_alpha + beta_2);
 
   //     hbar            c           ep_0          k_b         c*hbar       ep0_c_hbar
@@ -295,9 +290,7 @@ void RecombinationHistory::solve_for_optical_depth_tau(){
   const double sigma_T = Constants.sigma_T;
 
   // Set up x-arrays to integrate over. We split into three regions as we need extra points in reionisation
-  const int npts = 1e5;
-  const int x_start = -16;
-  const int x_end = 4;
+  const int npts = npts_rec_arrays;
   const int x0_index = (int) (-x_start/((double) (x_end - x_start)/npts));
   Vector x_array = Utils::linspace(x_start, x_end, npts);
 
@@ -428,7 +421,7 @@ double RecombinationHistory::ne_of_x(double x) const{
   //...
   //...
   //...
-  double OmegaB = cosmo->get_OmegaB(x);
+  double OmegaB = cosmo->get_OmegaB(0);
   double rho_c  = cosmo->get_rho_crit();
   double a = exp(x);
   const double n_H = OmegaB*rho_c/(Constants.m_H*a*a*a);
@@ -460,8 +453,8 @@ void RecombinationHistory::info() const{
 //====================================================
 void RecombinationHistory::output(const std::string filename) const{
   std::ofstream fp(filename.c_str());
-  const int npts       = 5000;
-  const double x_min   = -16;
+  const int npts       = 10000;
+  const double x_min   = -14;
   const double x_max   = x_end;
 
   Vector x_array = Utils::linspace(x_min, x_max, npts);
