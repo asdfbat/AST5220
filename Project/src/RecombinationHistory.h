@@ -19,11 +19,11 @@ class RecombinationHistory{
     double Yp;
  
     // The start and end points for recombination arrays (can be modified)
-    const double x_start  = -14;
+    const double x_start  = -12;
     const double x_end    = 4;
     
     // Numbers of points of Xe,ne array (modify as you see fit)
-    const int npts_rec_arrays = 1e4;
+    const int npts_rec_arrays = 1e5;
   
     // Xe for when to switch between Saha and Peebles
     double Xe_saha_limit = 0.99;

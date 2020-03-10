@@ -107,7 +107,7 @@ void RecombinationHistory::solve_number_density_electrons(){
         Xe_arr[j+i] = Xe_Peebles[j];
         double a = exp(x_array_Peebles[j]);
         double n_H = OmegaB*rho_c/(m_H*a*a*a);
-        ne_arr[j+i] = Xe_arr[j]*n_H;
+        ne_arr[j+i] = Xe_arr[j+i]*n_H;
       }
 
       break;
@@ -132,8 +132,6 @@ void RecombinationHistory::solve_number_density_electrons(){
   }
 
   log_Xe_of_x_spline.create(x_array, Xe_log_arr);
-  // tau_of_x_spline.create(x_array, x_array); //PLACEHODLER: WRONG!
-  // g_tilde_of_x_spline.create(x_array, x_array); //PLACEHOLDER: WRONG!
 
   Utils::EndTiming("Xe");
 }
@@ -157,7 +155,7 @@ std::pair<double,double> RecombinationHistory::electron_fraction_from_saha_equat
   //const double OmegaB      = cosmo->get_OmegaB();
   //...
   //...
-  const double OmegaB = cosmo->get_OmegaB(x);
+  const double OmegaB = cosmo->get_OmegaB();
   const double rho_c  = cosmo->get_rho_crit();
   const double T_b    = cosmo->get_TCMB()/a;  // Assuming T_b = T_CMB/a to be a good approximation.
   
@@ -188,7 +186,8 @@ std::pair<double,double> RecombinationHistory::electron_fraction_from_saha_equat
   if(A < 1e-30){  // The solution to Xe becomes numerically unstable for large and small A,
     Xe = 0;       // so we hardcode the asymptotic solutions in each direction.
   }
-  else if(A > 1e12){
+  else if(A > 1e6){
+    printf("%f\n", x);
     Xe = 1;
   }
   else{
@@ -211,42 +210,42 @@ int RecombinationHistory::rhs_peebles_ode(double x, const double *Xe, double *dX
   const double a           = exp(x);
 
   // Physical constants in SI units
-  const long double k_b         = Constants.k_b;
-  const long double G           = Constants.G;
-  const long double c           = Constants.c;
-  const long double m_e         = Constants.m_e;
-  const long double hbar        = Constants.hbar;
-  const long double m_H         = Constants.m_H;
-  const long double sigma_T     = Constants.sigma_T;
-  const long double lambda_2s1s = Constants.lambda_2s1s;
-  const long double epsilon_0   = Constants.epsilon_0;
+  const double k_b         = Constants.k_b;
+  const double G           = Constants.G;
+  const double c           = Constants.c;
+  const double m_e         = Constants.m_e;
+  const double hbar        = Constants.hbar;
+  const double m_H         = Constants.m_H;
+  const double sigma_T     = Constants.sigma_T;
+  const double lambda_2s1s = Constants.lambda_2s1s;
+  const double epsilon_0   = Constants.epsilon_0;
 
   // Cosmological parameters
   // const double OmegaB      = cosmo->get_OmegaB();
   // ...
   // ...
-  const long double OmegaB    = cosmo->get_OmegaB();
-  const long double T_b       = cosmo->get_TCMB()/a;
-  const long double rho_c     = cosmo->get_rho_crit();
-  const long double H         = cosmo->H_of_x(x);
-  const long double n_H = OmegaB*rho_c/(Constants.m_H*a*a*a);
+  const double OmegaB    = cosmo->get_OmegaB();
+  const double T_b       = cosmo->get_TCMB()/a;
+  const double rho_c     = cosmo->get_rho_crit();
+  const double H         = cosmo->H_of_x(x);
+  const double n_H = OmegaB*rho_c/(Constants.m_H*a*a*a);
 
   // Commonly used combination of units, predifed for speed and prevention of loss of numerical precision.
-  const long double c_hbar     = c*hbar;
-  const long double ep0_c_hbar = epsilon_0/c_hbar;
-  const long double kb_Tb      = k_b*T_b;
-  const long double ep0_kb_Tb  = epsilon_0/kb_Tb;
+  const double c_hbar     = c*hbar;
+  const double ep0_c_hbar = epsilon_0/c_hbar;
+  const double kb_Tb      = k_b*T_b;
+  const double ep0_kb_Tb  = epsilon_0/kb_Tb;
 
   // Expression in the Peebles RHS equation.
-  const long double phi_2         = 0.448*log(ep0_kb_Tb);
-  const long double n_1s          = (1 - X_e)*n_H;
-  const long double Lambda_alpha = H*27*ep0_c_hbar*ep0_c_hbar*ep0_c_hbar/(64*M_PI*M_PI*n_1s);
-  const long double Lambda_2s1s  = 8.227;
-  const long double alpha_2      = 8/sqrt(3*M_PI)*sigma_T*c*sqrt(ep0_kb_Tb)*phi_2;
-  const long double beta         = alpha_2*pow((m_e*kb_Tb/(2*M_PI*hbar*hbar)), 1.5)*exp(-ep0_kb_Tb);
-  const long double beta_2       = alpha_2*pow((m_e*kb_Tb/(2*M_PI*hbar*hbar)), 1.5)*exp(-0.25*ep0_kb_Tb);
-  // const long double beta_22      = beta*exp(0.75*ep0_kb_Tb);
-  const long double Cr           = (Lambda_2s1s + Lambda_alpha)/(Lambda_2s1s + Lambda_alpha + beta_2);
+  const double phi_2         = 0.448*log(ep0_kb_Tb);
+  const double n_1s          = (1 - X_e)*n_H;
+  const double Lambda_alpha = H*27*ep0_c_hbar*ep0_c_hbar*ep0_c_hbar/(64*M_PI*M_PI*n_1s);
+  const double Lambda_2s1s  = 8.227;
+  const double alpha_2      = 8/sqrt(3*M_PI)*sigma_T*c*sqrt(ep0_kb_Tb)*phi_2;
+  const double beta         = alpha_2*pow((m_e*kb_Tb/(2*M_PI*hbar*hbar)), 1.5)*exp(-ep0_kb_Tb);
+  const double beta_2       = alpha_2*pow((m_e*kb_Tb/(2*M_PI*hbar*hbar)), 1.5)*exp(-0.25*ep0_kb_Tb);
+  const double beta_22      = beta*exp(0.75*ep0_kb_Tb);
+  const double Cr           = (Lambda_2s1s + Lambda_alpha)/(Lambda_2s1s + Lambda_alpha + beta_2);
 
   //     hbar            c           ep_0          k_b         c*hbar       ep0_c_hbar
   // 1.054572e-34  2.997925e+08  2.179872e-18  1.380649e-23  3.161527e-26  6.894998e+07
@@ -255,23 +254,24 @@ int RecombinationHistory::rhs_peebles_ode(double x, const double *Xe, double *dX
   // [6.0900e-20 - 9.3257e-26]   [3.5794e+01 - 2.3375e+07]
 
 
-  // static bool asdf = true;
-  // if(asdf){
-  //   printf("%10s  %10s  %10s  %10s  %10s  %10s  %10s  %10s\n", "x", "Tb", "alpha2", "ep0_kb_Tb", "phi2", "beta", "beta_2", "beta_22");
-  //   asdf=false;
-  // }
-
-  // printf("%10.4e  %10.4e  %10.4e  %10.4e  %10.4e  %10.4e,  %10.4e  %10.4e  %10.4e  %10.4e\n", x, (double) ep0_kb_Tb, (double) alpha_2, (double) ep0_kb_Tb, (double) phi_2, (double) beta, (double) beta_2, (double) beta_22, (double) alpha_2*pow((m_e*kb_Tb/(2*M_PI*hbar*hbar)), 1.5), (double) exp(-1/4*ep0_kb_Tb));
 
   //=============================================================================
   // TODO: Write the expression for dXedx
   //=============================================================================
   //...
   //...
-  // if(X_e > 0.98){
-  //   printf("%f %e %e\n", x, X_e, Cr/H*(beta*(1 - X_e) - n_H*alpha_2*X_e*X_e));
-  // }
   dXedx[0] = Cr/H*(beta*(1 - X_e) - n_H*alpha_2*X_e*X_e);
+
+
+  // static bool asdf = true;
+  // if(asdf){
+  //   printf("%10s  %10s  %10s  %10s  %10s  %10s  %10s  %10s\n", "x", "Tb", "alpha2", "ep0_kb_Tb", "phi2", "beta", "beta_2", "dXedx");
+  //   asdf=false;
+  // }
+
+  // if(x < -7.39)
+  // printf("%f %e %e\n", x, X_e, dXedx[0]);
+  // printf("%10.4e  %10.4e  %10.4e  %10.4e  %10.4e  %10.4e,  %10.4e  %10.4e  %10.4e  %10.4e\n", x, (double) ep0_kb_Tb, (double) alpha_2, (double) ep0_kb_Tb, (double) phi_2, (double) beta, (double) beta_2, (double) beta_22, (double) alpha_2*pow((m_e*kb_Tb/(2*M_PI*hbar*hbar)), 1.5), (double) dXedx[0]);
 
   // printf("%e %e %e %e %e %e %e %e\n", X_e, Cr, H, n_H, alpha_2, beta, beta_2, phi_2);
   // printf("%e %e %e %e %e %e\n", x, Xe[0], dXedx[0], Cr/H, beta*(1 - X_e), n_H*alpha_2*X_e*X_e);
@@ -421,7 +421,7 @@ double RecombinationHistory::ne_of_x(double x) const{
   //...
   //...
   //...
-  double OmegaB = cosmo->get_OmegaB(0);
+  double OmegaB = cosmo->get_OmegaB();
   double rho_c  = cosmo->get_rho_crit();
   double a = exp(x);
   const double n_H = OmegaB*rho_c/(Constants.m_H*a*a*a);
@@ -453,8 +453,8 @@ void RecombinationHistory::info() const{
 //====================================================
 void RecombinationHistory::output(const std::string filename) const{
   std::ofstream fp(filename.c_str());
-  const int npts       = 10000;
-  const double x_min   = -14;
+  const int npts       = 100000;
+  const double x_min   = x_start;
   const double x_max   = x_end;
 
   Vector x_array = Utils::linspace(x_min, x_max, npts);
