@@ -34,7 +34,9 @@ void RecombinationHistory::solve_number_density_electrons(){
   //=============================================================================
   // TODO: Set up x-array and make arrays to store X_e(x) and n_e(x) on
   //=============================================================================
-  Vector x_array = Utils::linspace(Constants.x_start, Constants.x_end, npts_rec_arrays);
+  const int x_start = -16;
+  const int x_end = 6;
+  Vector x_array = Utils::linspace(x_start, x_end, npts_rec_arrays);
   Vector Xe_arr(npts_rec_arrays);
   Vector ne_arr(npts_rec_arrays);
 
@@ -99,7 +101,7 @@ void RecombinationHistory::solve_number_density_electrons(){
 
       Vector Xe_Peebles = ode.get_data_by_component(0);
       // for(int j=0; j<remaining_indices; j++){
-      //   printf("%e\n", Xe_Peebles[j]);
+      //   printf("%f %e\n", x_array[i+j], Xe_Peebles[j]);
       // }
 
       const double OmegaB = cosmo->get_OmegaB();
@@ -135,7 +137,7 @@ void RecombinationHistory::solve_number_density_electrons(){
   }
 
   log_Xe_of_x_spline.create(x_array, Xe_log_arr);
-  tau_of_x_spline.create(x_array, x_array); //PLACEHODLER: WRONG!
+  // tau_of_x_spline.create(x_array, x_array); //PLACEHODLER: WRONG!
   g_tilde_of_x_spline.create(x_array, x_array); //PLACEHOLDER: WRONG!
 
   Utils::EndTiming("Xe");
@@ -214,49 +216,66 @@ int RecombinationHistory::rhs_peebles_ode(double x, const double *Xe, double *dX
   const double a           = exp(x);
 
   // Physical constants in SI units
-  const double k_b         = Constants.k_b;
-  const double G           = Constants.G;
-  const double c           = Constants.c;
-  const double m_e         = Constants.m_e;
-  const double hbar        = Constants.hbar;
-  const double m_H         = Constants.m_H;
-  const double sigma_T     = Constants.sigma_T;
-  const double lambda_2s1s = Constants.lambda_2s1s;
-  const double epsilon_0   = Constants.epsilon_0;
+  const long double k_b         = Constants.k_b;
+  const long double G           = Constants.G;
+  const long double c           = Constants.c;
+  const long double m_e         = Constants.m_e;
+  const long double hbar        = Constants.hbar;
+  const long double m_H         = Constants.m_H;
+  const long double sigma_T     = Constants.sigma_T;
+  const long double lambda_2s1s = Constants.lambda_2s1s;
+  const long double epsilon_0   = Constants.epsilon_0;
 
   // Cosmological parameters
   // const double OmegaB      = cosmo->get_OmegaB();
   // ...
   // ...
-  const double OmegaB    = cosmo->get_OmegaB();
-  const double T_b       = cosmo->get_TCMB()/a;
-  const double rho_c     = cosmo->get_rho_crit();
-  const double H         = cosmo->H_of_x(x);
-  const double n_H = OmegaB*rho_c/(Constants.m_H*a*a*a);
+  const long double OmegaB    = cosmo->get_OmegaB();
+  const long double T_b       = cosmo->get_TCMB()/a;
+  const long double rho_c     = cosmo->get_rho_crit();
+  const long double H         = cosmo->H_of_x(x);
+  const long double n_H = OmegaB*rho_c/(Constants.m_H*a*a*a);
 
   // Commonly used combination of units, predifed for speed and prevention of loss of numerical precision.
-  const double c_hbar     = c*hbar;
-  const double ep0_c_hbar = epsilon_0/c_hbar;
-  const double kb_Tb      = k_b*T_b;
-  const double ep0_kb_Tb  = epsilon_0/kb_Tb;
+  const long double c_hbar     = c*hbar;
+  const long double ep0_c_hbar = epsilon_0/c_hbar;
+  const long double kb_Tb      = k_b*T_b;
+  const long double ep0_kb_Tb  = epsilon_0/kb_Tb;
 
   // Expression in the Peebles RHS equation.
-  const double phi_2         = 0.448*log(ep0_kb_Tb);
-  const double n_1s          = (1 - X_e)*n_H;
-  const double Lambda_alpha = H*27*ep0_c_hbar*ep0_c_hbar*ep0_c_hbar/(64*M_PI*M_PI*n_1s);
-  const double Lambda_2s1s  = 8.227;
-  const double alpha_2      = 8/sqrt(3*M_PI)*sigma_T*c*sqrt(ep0_kb_Tb)*phi_2;
-  const double beta         = alpha_2*pow((m_e*kb_Tb/(2*M_PI*hbar*hbar)), 1.5)*exp(-ep0_kb_Tb);
-  const double beta_2       = beta*exp(3/4*ep0_kb_Tb);
-  const double Cr           = (Lambda_2s1s + Lambda_alpha)/(Lambda_2s1s + Lambda_alpha + beta_2);
+  const long double phi_2         = 0.448*log(ep0_kb_Tb);
+  const long double n_1s          = (1 - X_e)*n_H;
+  const long double Lambda_alpha = H*27*ep0_c_hbar*ep0_c_hbar*ep0_c_hbar/(64*M_PI*M_PI*n_1s);
+  const long double Lambda_2s1s  = 8.227;
+  const long double alpha_2      = 8/sqrt(3*M_PI)*sigma_T*c*sqrt(ep0_kb_Tb)*phi_2;
+  const long double beta         = alpha_2*pow((m_e*kb_Tb/(2*M_PI*hbar*hbar)), 1.5)*exp(-ep0_kb_Tb);
+  const long double beta_2       = alpha_2*pow((m_e*kb_Tb/(2*M_PI*hbar*hbar)), 1.5)*exp(-0.25*ep0_kb_Tb);
+  const long double beta_22      = beta*exp(0.75*ep0_kb_Tb);
+  const long double Cr           = (Lambda_2s1s + Lambda_alpha)/(Lambda_2s1s + Lambda_alpha + beta_2);
 
+  //     hbar            c           ep_0          k_b         c*hbar       ep0_c_hbar
+  // 1.054572e-34  2.997925e+08  2.179872e-18  1.380649e-23  3.161527e-26  6.894998e+07
+  
+  //           kB_Tb                     ep0_kB_Tb
+  // [6.0900e-20 - 9.3257e-26]   [3.5794e+01 - 2.3375e+07]
+
+
+  static bool asdf = true;
+  if(asdf){
+    printf("%10s  %10s  %10s  %10s  %10s  %10s  %10s  %10s\n", "x", "Tb", "alpha2", "ep0_kb_Tb", "phi2", "beta", "beta_2", "beta_22");
+    asdf=false;
+  }
+
+  printf("%10.4e  %10.4e  %10.4e  %10.4e  %10.4e  %10.4e,  %10.4e  %10.4e  %10.4e  %10.4e\n", x, (double) ep0_kb_Tb, (double) alpha_2, (double) ep0_kb_Tb, (double) phi_2, (double) beta, (double) beta_2, (double) beta_22, (double) alpha_2*pow((m_e*kb_Tb/(2*M_PI*hbar*hbar)), 1.5), (double) exp(-1/4*ep0_kb_Tb));
 
   //=============================================================================
   // TODO: Write the expression for dXedx
   //=============================================================================
   //...
   //...
-  
+  // if(X_e > 0.98){
+  //   printf("%f %e %e\n", x, X_e, Cr/H*(beta*(1 - X_e) - n_H*alpha_2*X_e*X_e));
+  // }
   dXedx[0] = Cr/H*(beta*(1 - X_e) - n_H*alpha_2*X_e*X_e);
 
   // printf("%e %e %e %e %e %e %e %e\n", X_e, Cr, H, n_H, alpha_2, beta, beta_2, phi_2);
@@ -272,8 +291,14 @@ int RecombinationHistory::rhs_peebles_ode(double x, const double *Xe, double *dX
 void RecombinationHistory::solve_for_optical_depth_tau(){
   Utils::StartTiming("opticaldepth");
 
+  const double c = Constants.c;
+  const double sigma_T = Constants.sigma_T;
+
   // Set up x-arrays to integrate over. We split into three regions as we need extra points in reionisation
-  const int npts = 1000;
+  const int npts = 1e5;
+  const int x_start = -16;
+  const int x_end = 4;
+  const int x0_index = (int) (-x_start/((double) (x_end - x_start)/npts));
   Vector x_array = Utils::linspace(x_start, x_end, npts);
 
   // The ODE system dtau/dx, dtau_noreion/dx and dtau_baryon/dx
@@ -284,9 +309,10 @@ void RecombinationHistory::solve_for_optical_depth_tau(){
     //=============================================================================
     //...
     //...
+    double H = cosmo->H_of_x(x);
+    double n_e = ne_of_x(x);
 
-    // Set the derivative for photon optical depth
-    dtaudx[0] = 0.0;
+    dtaudx[0] = -c*n_e*sigma_T/H;
 
     return GSL_SUCCESS;
   };
@@ -297,6 +323,21 @@ void RecombinationHistory::solve_for_optical_depth_tau(){
   //...
   //...
 
+  Vector tau_inc = {1e5};
+
+  ODESolver ode;
+  ode.solve(dtaudx, x_array, tau_inc);
+  Vector tau_arr = ode.get_data_by_component(0);
+  // Vector tau_dx_arr = ode.get_data_by_component(1);
+
+  // for(int i=0;)
+
+  double tau_0 = tau_arr[x0_index];
+  for(int i=0; i<npts; i++){
+    tau_arr[i] -= tau_0;
+  }
+
+  tau_of_x_spline.create(x_array, tau_arr);
   //=============================================================================
   // TODO: Compute visibility functions and spline everything
   //=============================================================================
@@ -415,7 +456,7 @@ void RecombinationHistory::info() const{
 void RecombinationHistory::output(const std::string filename) const{
   std::ofstream fp(filename.c_str());
   const int npts       = 5000;
-  const double x_min   = x_start;
+  const double x_min   = -16;
   const double x_max   = x_end;
 
   Vector x_array = Utils::linspace(x_min, x_max, npts);

@@ -31,7 +31,7 @@ BackgroundCosmology::BackgroundCosmology(
 void BackgroundCosmology::solve(){
   Utils::StartTiming("Eta");
     
-  int npts = 100000;
+  int npts = 1e5;
   double x_start = Constants.x_start_solve;
   double x_stop = Constants.x_end_solve;
   double a_start = exp(x_start);

@@ -19,7 +19,7 @@ int main(int argc, char **argv){
   double TCMB        = 2.725;
 
   // Recombination parameters
-  double Yp          = 0.24;
+  double Yp          = 0.0;
 
   //=========================================================================
   // Module I
@@ -47,11 +47,11 @@ int main(int argc, char **argv){
   // Output recombination quantities
   rec.output("../data/recombination.txt");
 
-  RecombinationHistory rec_saha(&cosmo, Yp);
-  rec_saha.set_saha_limit(0.0);
-  rec_saha.solve();
-  rec_saha.info();
-  rec_saha.output("../data/recombination_Saha.txt");
+  // RecombinationHistory rec_saha(&cosmo, Yp);
+  // rec_saha.set_saha_limit(0.0);
+  // rec_saha.solve();
+  // rec_saha.info();
+  // rec_saha.output("../data/recombination_saha.txt");
 
   // Remove when module is completed
   return 0;
