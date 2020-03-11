@@ -94,7 +94,7 @@ void RecombinationHistory::solve_number_density_electrons(){
       }
       Vector Xe_inc = {Xe_current};
 
-      ODESolver ode;
+      ODESolver ode(1e-8, 1e-12, 1e-12);
       ode.solve(dXedx, x_array_Peebles, Xe_inc);
 
       Vector Xe_Peebles = ode.get_data_by_component(0);
@@ -183,11 +183,10 @@ std::pair<double,double> RecombinationHistory::electron_fraction_from_saha_equat
 
   double A = 1/(n_b) * pow((m_e*k_b*T_b)/(2*M_PI*hbar*hbar), 1.5) * exp(-epsilon_0/(k_b*T_b));
 
-  if(A < 1e-30){  // The solution to Xe becomes numerically unstable for large and small A,
+  if(A < 1e-20){  // The solution to Xe becomes numerically unstable for large and small A,
     Xe = 0;       // so we hardcode the asymptotic solutions in each direction.
   }
   else if(A > 1e6){
-    printf("%f\n", x);
     Xe = 1;
   }
   else{
@@ -262,19 +261,6 @@ int RecombinationHistory::rhs_peebles_ode(double x, const double *Xe, double *dX
   //...
   dXedx[0] = Cr/H*(beta*(1 - X_e) - n_H*alpha_2*X_e*X_e);
 
-
-  // static bool asdf = true;
-  // if(asdf){
-  //   printf("%10s  %10s  %10s  %10s  %10s  %10s  %10s  %10s\n", "x", "Tb", "alpha2", "ep0_kb_Tb", "phi2", "beta", "beta_2", "dXedx");
-  //   asdf=false;
-  // }
-
-  // if(x < -7.39)
-  // printf("%f %e %e\n", x, X_e, dXedx[0]);
-  // printf("%10.4e  %10.4e  %10.4e  %10.4e  %10.4e  %10.4e,  %10.4e  %10.4e  %10.4e  %10.4e\n", x, (double) ep0_kb_Tb, (double) alpha_2, (double) ep0_kb_Tb, (double) phi_2, (double) beta, (double) beta_2, (double) beta_22, (double) alpha_2*pow((m_e*kb_Tb/(2*M_PI*hbar*hbar)), 1.5), (double) dXedx[0]);
-
-  // printf("%e %e %e %e %e %e %e %e\n", X_e, Cr, H, n_H, alpha_2, beta, beta_2, phi_2);
-  // printf("%e %e %e %e %e %e\n", x, Xe[0], dXedx[0], Cr/H, beta*(1 - X_e), n_H*alpha_2*X_e*X_e);
   return GSL_SUCCESS;
 }
 
@@ -318,7 +304,7 @@ void RecombinationHistory::solve_for_optical_depth_tau(){
 
   Vector tau_inc = {1e5};
 
-  ODESolver ode;
+  ODESolver ode(1e-8, 1e-12, 1e-12);
   ode.solve(dtaudx, x_array, tau_inc);
   Vector tau_arr = ode.get_data_by_component(0);
   Vector dtaudx_arr = ode.get_derivative_data_by_component(0);
@@ -337,10 +323,14 @@ void RecombinationHistory::solve_for_optical_depth_tau(){
   //...
   //...
   Vector g_arr(npts);
+  double g_integral = 0;
   for(int i=0; i<npts; i++){
     g_arr[i] = -dtaudx_arr[i]*exp(-tau_arr[i]);
+    g_integral += g_arr[i];
   }
   g_tilde_of_x_spline.create(x_array, g_arr);
+  g_integral *= (x_end - x_start)/npts;
+  printf("Integral over g_tilde = %f\n", g_integral);
 
   Utils::EndTiming("opticaldepth");
 }
