@@ -55,6 +55,8 @@ In this report, we will study the period of recombination, with the aim of solvi
 
 The calculations will be performed under the assumption that the universe contains no heavier elements than Hydrogen. We will also be ignoring the event of \textit{reionization}, where the universe became ionized again around $x\approx -2$.
 
+We also wish to pinpoint at what times the events of recombination and last scattering happens. Recombination is more of a period characterized by sharp fall in the free electron fraction than it is a specific event, but we will define it as the point where $X_e = 0.5$. The surface of last scattering is the point in time where most of the photons we oberve today would have last scattered, and can best be defined as the maximum of the visibility function.
+
 \section{Theory}
 \subsection{The visibility function}
 Our main goal is to model the visibility function $\tilde{g}(x)$ over the epoch of recombination. The visibility function is a probability function, representing the probability of any photon today to last have scattered at time $x$. If you asked random photons arriving from space when they last met a stranger, their answers would follow the distribution $\tilde{g}(x)$. It is an explicit function of the optical depth $\tau$, and its derivative, as
@@ -70,13 +72,13 @@ Being a probability function, it's normalized to one, as can be observed from in
 
 
 \subsection{The optical depth}
-The visibility function requires a solution of the optical depth $\tau(x)$. The optical depth represents the optical thickness the universe exhibits at some time $x$. A high optical depth means photons travel very short distances before being absorbed or scattered. 
+The visibility function requires a solution of the optical depth $\tau(x)$. The optical depth represents the optical thickness the universe exhibits for photons originating at some time $x$. A high optical depth means photons travel very short distances before being absorbed or scattered. The optical depth can be related to the observed intensity of some source $I_0$ originating at a time/distance $x$, where we would observe an intensity today as $I = I_0\exp{-\tau(x)}$.
 
 $\tau$ can be written as a differential equation on the form
 \begin{equation}\label{eqn:tau_ODE}
     \tau^\prime = - c \sigma_T\frac{n_{e}(x)}{H(x)}
 \end{equation}
-where $c$ is the speed of light, $\sigma_T = \frac{8 \pi}{3} \frac{\alpha^{2} \hbar^{2}}{m_{e}^{2} c^{2}}$ is the Thompson scattering cross-section, $n_e(x)$ is the electron density, and $H(x)$ is the Hubble parameter. As we can see, the chase continues, and $\tau$ is dependent on the solution of both $n_e(x)$ and $H(x)$. An accounting of the solution of $H(x)$ can be found in \cite{Milestone1}, while $n_e(x)$ will be discussed in the coming sections.
+where $c$ is the speed of light, $\sigma_T = \frac{8 \pi}{3} \frac{\alpha^{2} \hbar^{2}}{m_{e}^{2} c^{2}}$ is the Thompson scattering cross-section, $n_e(x)$ is the electron density, and $H(x)$ is the Hubble parameter. As we can see, the chase continues, and $\tau$ is dependent on the solution of both $n_e(x)$ and $H(x)$. An accounting of the solution of $H(x)$ can be found in Milestone I (\cite{Milestone1}), while $n_e(x)$ will be discussed in the coming sections.
 
 
 \subsection{Dimensionality analysis}
@@ -131,24 +133,25 @@ We can also observe from \ref{eqn:Saha} that, as $X_e \rightarrow 1$, A will qui
 At the other end, as $X_e \rightarrow 1$, A will diverge to infinity, as $A \propto (1 - X_e)^{-1}$.
 
 A reasonable solution to both these problems is to simply define
-\begin{equation*}
+\begin{equation}\label{eqn:Saha_sol2}
     X_e =
     \begin{cases}
         \quad\quad 0& \quad A < 10^{-20} \\
         \quad\quad 1& \quad A > 10^6 \\
         - \frac{A}{2} + \frac{A}{2}\qty(1 + \frac{4}{A})^{1/2}& \quad else
      \end{cases}    
-\end{equation*}
+\end{equation}
 avoiding any numerical stability issues.
 
 
 \subsection{The Peebles equation}\label{sec:Peebles}
-
+After the Saha regime ends, the solutions will be treated with the full Peebles equation. The equation can be found on its natural-unit form in \cite{ModernCosmology2003}
 \begin{equation}
     \label{eqn:Peebles}
     \dv{X_{e}}{x}=\frac{C_{r}\qty(T_{b})}{H}\qty[\beta\qty(T_{b})\qty(1-X_{e})-n_{H} \alpha^{(2)}\qty(T_{b}) X_{e}^{2}]
 \end{equation}
 
+The equation itself looks the same in natural units, but it contains a series of varaibles shown below, all of which have been rewritten with the proper dimensional analysis shown in appendix \ref{sec:appendixA}.
 \begin{align}
     \label{eqn:1x}
     C_{r}\qty(T_{b}) &=\frac{\Lambda_{2 s \rightarrow 1 s}+\Lambda_{\alpha}}{\Lambda_{2 s \rightarrow 1 s}+\Lambda_{\alpha}+\beta^{(2)}\qty(T_{b})} \\
@@ -168,18 +171,48 @@ avoiding any numerical stability issues.
     \phi_{2}\qty(T_{b}) &=0.448 \ln \qty(\epsilon_{0} / k_B T_{b})
 \end{align}
 
+The baryon temperature is non-trivial, but a good approximation is to assume that it evolves naturally with the photon temperature, such that
+\begin{equation*}
+    T_{b} = T_{CMB}a^{-1} = \SI{2.725}{K}\cdot a^{-1}
+\end{equation*}
 
 
+\section{Implementation}
+The code used in this report can be found at \url{https://github.com/asdfbat/AST5220/tree/master/Project}. The simulations themselves are found in the \texttt{src/} directory, and is built upon the C++ code template provided by Hans Arnold Winther.
+
+The code builds upon the work from Milestone I \cite{Milestone1} and the associated code, found in the \textit{Background cosmology} class in \texttt{src/BackgroundCosmology.cpp}.
+
+The \textit{RecombinationHistory} class found in \texttt{src/RecombinationHistory.cpp} covers the work done in this milestone. The associated \texttt{Makefile} can be run as \textbf{make all run} to compile and run all code both from this milestone, and dependent code from Milestone I.
+
+The \textit{RecombinationHistory} class takes as constructor arguments an instance of the \textit{BackgroundCosmology} class, as well as the helium number fraction $Y_p$, which we are setting to zero. The \textit{solve} method calls first upon the method \textit{solve\_number\_density\_electrons}, which employs first the Saha equation solution \ref{eqn:Saha_sol2} for $X_e \leq 0.99$, and thereafter solves the Peebles equation for $X_e < 0.99$. The Peebles equation is solved as an ODE using the ODESolver class from the GSL library, which is wrapped in the helperclass \textit{ODESolver} found in \texttt{src/ODESolver.cpp}. The equations are solved in the interval $x\in [-12, 4]$ using $10^5$ linearly spaced points in $x$. The results of $X_e$ are splined using the spline class of the GSL library, again wrapped in a helperclass, \textit{Spline}, found in \texttt{src/Spline.cpp}. We in reality spline $\log{X_e}$, as it behaves more smoothly in $x$, and simply undo this whenever we need $X_e$.
+
+With the solution of $X_e$ (and thereby $n_e$) known and splined, the \textit{solve} method calls upon the\\
+\textit{solve\_for\_optical\_depth\_tau} method. This method solves \ref{eqn:tau_ODE} for $\tau(x)$ using the GSL ODESolver implementation over $x\in[-12, 4]$, using $10^5$ points in $x$. The initial condition of $\tau$ at $x=-12$ is unknown, and we set the initial condition to some arbitrary value $\tau(x=-12) = 10^5$. Since the optical thickness is, by definition, zero today ($\tau(x=0) = 0$), we simply rescale the final solution such that this is true, by subtracting todays value. The reason this works is because the RHS of \ref{eqn:tau_ODE} is independent of $\tau$, and the solution will be correct to within a constant independent on the initial condition. The solution of $\tau$ is splined, together with its first two derivatives with regards to $x$. The first derivative is known from the ODE, while the second is found using a built-in differentiator in the spline class.
+
+The result of $\tau$ is used to calculate the visibility function $\tilde{g}$ from \ref{eqn:g_tilde}, which is also splined, together with its first two derivatives in $x$, both calculated using the spline differentiator.
 
 
 
 \section{Results}
+\subsection{Free electron fraction}
+Figure \ref{fig:Xe} shows the evolution of the free electron fraction as function of $x$ for both the Saha approximation, and the solved Peebles equation (still using Saha before the "Saha limit" of $X_e < 0.99$). We can see that the solutions diverge shortly after the Saha limit, with the Saha solution quickly falling off towards zero, while the Peebles solution stabilizes towards a value of $X_e(x=0) = 1.9\times 10^{-4}$ today.
+
+Saha also predicts an earlier point of recombination than Peebles does, at $x = -7.17$ and $x= - 7.23$, respectively. This is of course simply because it dropps faster to the recombination definition of $X_e = 0.5$. The surface of last scattering is also indicated, which we'll come back to in section \ref{sec:results:g_tilde}.
+
+TODO: Write about why the electron fraction evens out in Peebles.
+
+
 \begin{figure}[H]
     \centering
     \includegraphics[scale=0.5]{../m2_figs/Xe.pdf}
-    \caption{Figure showing the relative electron density as function of $x=\log{a}$, solved using the Saha equation only (red), and both the Saha and Peebles equation (blue), with a transition at $X_e = 0.99$. The right panel shows a zoomed in version, additionally showing the following events as vertical lines: 1) The Saha-Peebles transition limit, at $X_e = 0.99$. 2) The event of recombination, defined as $X_e = 0.5$, as calculated from the Saha equation only. 3) The event of recombination, as calculated by both the Saha and Peebles equation. 4) The surface of last scattering, defined as the point where $\tau = 1$ (see figure \ref{fig:tau}).}
+    \caption{Figure showing the relative electron density as function of $x=\log{a}$, solved using the Saha equation only (red), and both the Saha and Peebles equation (blue), with a transition at $X_e = 0.99$. The right panel shows a zoomed in version, additionally showing the following events as vertical lines: 1) The Saha-Peebles transition limit, at $X_e = 0.99$. 2) The event of recombination, defined as $X_e = 0.5$, as calculated from the Saha equation only. 3) The event of recombination, as calculated by both the Saha and Peebles equation. 4) The surface of last scattering, defined as the point where $g$ reaches its maximum value (see figure \ref{fig:g_tilde}).}
     \label{fig:Xe}
 \end{figure}
+
+
+\subsection{Optical depth}
+Figure \ref{fig:tau} shows the optical depth $\tau$ as function of $x$, as well as its derivatives in $x$. We see that $\tau(x)$, apart from per definition falling to zero at $x=0$, exhibits three distinct regions. Looking forward in time from $x=-12$, we see that the early universe is incredibly optically thick. The mean free path was in this era very small, due to the dense plasma soup state the universe found itself in. The optical depth decreases linearly \footnote{since its log-plotted against $x$, linear behavior corresponds to exponential dependence on $x$, which again corresponds to power-law dependence in $a$} until around $x=-7.4$, where $X_e$ starts undergoing a sharp decline due to recombination. During this region, we see a sharp decline in the optical depth. 
+
 
 \begin{figure}[H]
     \centering
@@ -187,6 +220,9 @@ avoiding any numerical stability issues.
     \caption{Figure showing the optical depth $\tau(x)$, as well as its derivatives (with regards to $x$). The right panel shows a zoomed in version, in addition to vertical lines indicating events described in \ref{fig:Xe}.}
     \label{fig:tau}
 \end{figure}
+
+
+\subsection{Visibility function}\label{sec:results:g_tilde}
 
 \begin{figure}[H]
     \centering
