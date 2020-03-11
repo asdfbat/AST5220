@@ -57,7 +57,7 @@ The calculations will be performed under the assumption that the universe contai
 
 We also wish to pinpoint at what times the events of recombination and last scattering happens. Recombination is more of a period characterized by sharp fall in the free electron fraction than it is a specific event, but we will define it as the point where $X_e = 0.5$. The surface of last scattering is the point in time where most of the photons we oberve today would have last scattered, and can best be defined as the maximum of the visibility function.
 
-\section{Theory}
+\section{Theory and method}
 \subsection{The visibility function}
 Our main goal is to model the visibility function $\tilde{g}(x)$ over the epoch of recombination. The visibility function is a probability function, representing the probability of any photon today to last have scattered at time $x$. If you asked random photons arriving from space when they last met a stranger, their answers would follow the distribution $\tilde{g}(x)$. It is an explicit function of the optical depth $\tau$, and its derivative, as
 \begin{equation}\label{eqn:g_tilde}
@@ -82,19 +82,19 @@ where $c$ is the speed of light, $\sigma_T = \frac{8 \pi}{3} \frac{\alpha^{2} \
 
 
 \subsection{Dimensionality analysis}
-Due to their fondness of confusing notation and immense pleasure in dropping terms from equations\footnote{Theories that this stems from laziness have been thoroughly debunked.}, astrophysicists often employ so-called natural units. This involves choosing a set of physical units such that a lot of commonly used constants become unity. For our purposes, this involves $c = \hbar = k_B = 0$. For this reason, equation like \ref{eqn:tau_ODE} might be found in the literature as
+Due to their fondness of confusing notation and immense pleasure in dropping terms from equations\footnote{Theories that this stems from laziness have been thoroughly debunked.}, astrophysicists often employ so-called natural units. This involves choosing a set of physical units such that a lot of commonly used constants become unity. For our purposes, this involves $c = \hbar = k_B = 1$. For this reason, equation like \ref{eqn:tau_ODE} might be found in the literature as
 \begin{equation*}
     \tau^\prime = - \sigma_T\frac{n_{e}(x)}{H(x)}
 \end{equation*}
-with the factor of $c$ lacking. This might be awfully convenient during derivations, but when we at the end of the day require physical quantities in known units, we need a way of reintroducing these missing constants in a consistent way. This is known as dimensionality analysis, and entails looking at the apperant dimensions of the equation, comparing it to the dimensions it \textit{should} have, and inserting constants to make it so.
+with the factor of $c$ lacking. This might be awfully convenient during derivations, but when we at the end of the day require physical quantities in known units, we need a way of reintroducing these missing constants in a consistent way. This is known as dimensionality analysis, and entails looking at the apperant dimensions of the equation, comparing it to the dimensions it \textit{should} have, and inserting constants to make it so. For instance, we can easially see that the RHS of the equation above lacks units corresponding to those of the constant $c$, from the knowledge that $\tau'$ is unitless, and the RHS must therefore be so as well.
 
 Appendix \ref{sec:appendixA} offers a walkthrough of the dimensional analysis required to reconstruct both the Saha and Peebles equation from their natural-unit forms.
 
 
 \subsection{Free electron fraction and the Boltzmann equation}
-The most important quantity deciding the optical depth is the free electron density $n_e$, or a very related quantity - the free electron fraction $X_e = \frac{n_e}{n_b}$, where $n_b$ is the baryon density (remember that we assume no heavier elements than Hydrogen). Under the same assumption, we know the baryon density of the universe to be $n_b = \frac{\Omega_{b,0}}{m_ha^3}$ (see \cite{Milestone1}).
+The most important quantity deciding the optical depth is the free electron density $n_e$, or a very related quantity - the free electron fraction $X_e = \frac{n_e}{n_b}$, where $n_b$ is the baryon density (remember that we assume no heavier elements than Hydrogen). Under the same assumption, we know the baryon density of the universe to be $n_b = \frac{\Omega_{b,0}\rho_{c,0}}{m_ha^3}$ (see \cite{Milestone1}).
 
-The density of any particle species of the universe can be modelled using the Boltzmann equation, presented below on its most general form.
+The density of any particle species in the universe can be modelled using the Boltzmann equation, presented below on its most general form.
 \begin{equation*}
     \dv{f}{t} = C[f]
 \end{equation*}
@@ -184,7 +184,7 @@ The code builds upon the work from Milestone I \cite{Milestone1} and the associa
 
 The \textit{RecombinationHistory} class found in \texttt{src/RecombinationHistory.cpp} covers the work done in this milestone. The associated \texttt{Makefile} can be run as \textbf{make all run} to compile and run all code both from this milestone, and dependent code from Milestone I.
 
-The \textit{RecombinationHistory} class takes as constructor arguments an instance of the \textit{BackgroundCosmology} class, as well as the helium number fraction $Y_p$, which we are setting to zero. The \textit{solve} method calls first upon the method \textit{solve\_number\_density\_electrons}, which employs first the Saha equation solution \ref{eqn:Saha_sol2} for $X_e \leq 0.99$, and thereafter solves the Peebles equation for $X_e < 0.99$. The Peebles equation is solved as an ODE using the ODESolver class from the GSL library, which is wrapped in the helperclass \textit{ODESolver} found in \texttt{src/ODESolver.cpp}. The equations are solved in the interval $x\in [-12, 4]$ using $10^5$ linearly spaced points in $x$. The results of $X_e$ are splined using the spline class of the GSL library, again wrapped in a helperclass, \textit{Spline}, found in \texttt{src/Spline.cpp}. We in reality spline $\log{X_e}$, as it behaves more smoothly in $x$, and simply undo this whenever we need $X_e$.
+The \textit{RecombinationHistory} class takes as constructor arguments an instance of the \textit{BackgroundCosmology} class, as well as the helium number fraction $Y_p$, which we are setting to zero. The \textit{solve} method calls first upon the method \textit{solve\_number\_density\_electrons}, which employs first the Saha equation solution \ref{eqn:Saha_sol2} for $X_e \leq 0.99$, and thereafter solves the Peebles equation for $X_e > 0.99$. The Peebles equation is solved as an ODE using the ODESolver class from the GSL library, which is wrapped in the helperclass \textit{ODESolver} found in \texttt{src/ODESolver.cpp}. The equations are solved in the interval $x\in [-12, 4]$ using $10^5$ linearly spaced points in $x$. The results of $X_e$ are splined using the spline class of the GSL library, again wrapped in a helperclass, \textit{Spline}, found in \texttt{src/Spline.cpp}. We in reality spline $\log{X_e}$, as it behaves more smoothly in $x$, and simply undo this whenever we need $X_e$.
 
 With the solution of $X_e$ (and thereby $n_e$) known and splined, the \textit{solve} method calls upon the\\
 \textit{solve\_for\_optical\_depth\_tau} method. This method solves \ref{eqn:tau_ODE} for $\tau(x)$ using the GSL ODESolver implementation over $x\in[-12, 4]$, using $10^5$ points in $x$. The initial condition of $\tau$ at $x=-12$ is unknown, and we set the initial condition to some arbitrary value $\tau(x=-12) = 10^5$. Since the optical thickness is, by definition, zero today ($\tau(x=0) = 0$), we simply rescale the final solution such that this is true, by subtracting todays value. The reason this works is because the RHS of \ref{eqn:tau_ODE} is independent of $\tau$, and the solution will be correct to within a constant independent on the initial condition. The solution of $\tau$ is splined, together with its first two derivatives with regards to $x$. The first derivative is known from the ODE, while the second is found using a built-in differentiator in the spline class.
@@ -211,7 +211,9 @@ TODO: Write about why the electron fraction evens out in Peebles.
 
 
 \subsection{Optical depth}
-Figure \ref{fig:tau} shows the optical depth $\tau$ as function of $x$, as well as its derivatives in $x$. We see that $\tau(x)$, apart from per definition falling to zero at $x=0$, exhibits three distinct regions. Looking forward in time from $x=-12$, we see that the early universe is incredibly optically thick. The mean free path was in this era very small, due to the dense plasma soup state the universe found itself in. The optical depth decreases linearly \footnote{since its log-plotted against $x$, linear behavior corresponds to exponential dependence on $x$, which again corresponds to power-law dependence in $a$} until around $x=-7.4$, where $X_e$ starts undergoing a sharp decline due to recombination. During this region, we see a sharp decline in the optical depth. 
+Figure \ref{fig:tau} shows the optical depth $\tau$ as function of $x$, as well as its derivatives in $x$. We see that $\tau(x)$, apart from per definition falling to zero at $x=0$, exhibits three distinct regions. Looking forward in time from $x=-12$, we see that the early universe is incredibly optically thick. The mean free path was in this era very small, due to the dense plasma soup state the universe found itself in. The optical depth decreases linearly \footnote{since its log-plotted against $x$, linear behavior corresponds to exponential dependence on $x$, which again corresponds to power-law dependence in $a$} until around $x=-7.4$, where $X_e$ starts undergoing a sharp decline due to recombination. During this region, we see a sharp decline in the optical depth as the universe changes from a coupled soup state to one consisting almost entirely of neutral Hydrogen (as well as a decent fraction of Helium, which we won't consider). Half-way through this rapid drop, around $x=-6.9$, $\tau$ crosses the value of $1$, which is known as the surface of last scattering, and represents the \textit{most probable} point of origin for any photon observed today. As $X_e$ flattens out, $\tau$ again enters a new phase of less steep decline, before falling to zero today, by definition.
+
+TODO: Write some about the derivatives.
 
 
 \begin{figure}[H]
@@ -224,6 +226,8 @@ Figure \ref{fig:tau} shows the optical depth $\tau$ as function of $x$, as well
 
 \subsection{Visibility function}\label{sec:results:g_tilde}
 
+
+
 \begin{figure}[H]
     \centering
     \includegraphics[scale=0.5]{../m2_figs/g_tilde.pdf}
@@ -233,7 +237,9 @@ Figure \ref{fig:tau} shows the optical depth $\tau$ as function of $x$, as well
 
 \appendix
 \section{Dimensionality analysis}\label{sec:appendixA}
-We introduce the following notation
+Dimensionality analysis is a powerful tool with many purposes. Here, we will simply focus on restoring lost constants from equations written in natural units. Although there exists rigorous ways of doing this by setting up systems of equations, this can be tiresome, and it was in our case found sufficient to simply apply some sound logic and qualified guesses.
+
+We introduce the following notation for the dimensions of interest
 \begin{itemize}
     \item $T$ - Temperature
     \item $t$ - Time
@@ -248,6 +254,14 @@ In natural units, quantities are scaled in such a way that $c = \hbar = k_B = 1$
     \item $[\hbar] = Et = ML^2t^{-1}$
     \item $[k_B] = ET^{-1} = ML^2t^{-2}T^{-1}$
 \end{itemize}
+
+Our approach will be simple. For each relevant expression which might be missing constants, we will
+\begin{itemize}
+    \item Calculate the dimensions the expression appear to have.
+    \item Deduce what dimensions the expression \textit{should} have from the context of the expression.
+    \item Find a combination of $\hbar$, $c$ and $k_B$ which makes up for the difference.
+\end{itemize}
+
 
 \subsection{Dimensionality analysis of the Saha equation}
 \begin{equation}
@@ -384,10 +398,14 @@ The correct expression for $\beta$ is then
 
 
 \section{Saha-Peebles transition stability}
+Figure \ref{fig:num_stab} shows $X_e$, $\tau$ and its derivatives as function of $x$ over a small interval around the Saha limit. From the first figure we see that, although the transition from the Saha solution to the Peebles solution is continous, there is a slight change in direction just at the transition limit.
+
+This seems to be inconsequential to both $\tau$ and $\tau'$, but appears to give rise to some unfortunate squiggles in $\tau''$. A potential solution could be moving the Saha limit even further back, where the transition between the Saha and Peebles solution should be less noticable, if the Peebles equation doesn't run into numerical stability issues.
+
 \begin{figure}[H]
     \centering
     \includegraphics[scale=0.5]{../m2_figs/num_stab.pdf}
-    \caption{}
+    \caption{Figure showing extremely zoomed in plots of $X_e$ as well as $\tau$ and its derivatives, around the transition point between the Saha and Peebles equations.}
     \label{fig:num_stab}
 \end{figure}
 
