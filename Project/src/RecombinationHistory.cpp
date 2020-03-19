@@ -278,7 +278,8 @@ void RecombinationHistory::solve_for_optical_depth_tau(){
   // Set up x-arrays to integrate over. We split into three regions as we need extra points in reionisation
   const int npts = npts_rec_arrays;
   const int x0_index = (int) (-x_start/((double) (x_end - x_start)/npts));
-  Vector x_array = Utils::linspace(x_start, x_end, npts);
+  Vector x_array = Utils::linspace(x_start, 0, npts);
+  Vector x_array_backwards = Utils::linspace(0, -x_start, npts);
 
   // The ODE system dtau/dx, dtau_noreion/dx and dtau_baryon/dx
   ODEFunction dtaudx = [&](double x, const double *tau, double *dtaudx){
@@ -288,8 +289,8 @@ void RecombinationHistory::solve_for_optical_depth_tau(){
     //=============================================================================
     //...
     //...
-    double H = cosmo->H_of_x(x);
-    double n_e = ne_of_x(x);
+    double H = cosmo->H_of_x(-x);
+    double n_e = ne_of_x(-x);
 
     dtaudx[0] = -c*n_e*sigma_T/H;
 
@@ -302,17 +303,18 @@ void RecombinationHistory::solve_for_optical_depth_tau(){
   //...
   //...
 
-  Vector tau_inc = {1e5};
+  Vector tau_inc = {0};
 
   ODESolver ode(1e-8, 1e-12, 1e-12);
-  ode.solve(dtaudx, x_array, tau_inc);
-  Vector tau_arr = ode.get_data_by_component(0);
-  Vector dtaudx_arr = ode.get_derivative_data_by_component(0);
+  ode.solve(dtaudx, x_array_backwards, tau_inc);
+  Vector tau_arr_backwards = ode.get_data_by_component(0);
+  Vector dtaudx_arr_backwards = ode.get_derivative_data_by_component(0);
 
-
-  double tau_0 = tau_arr[x0_index];
+  Vector tau_arr(npts);
+  Vector dtaudx_arr(npts);
   for(int i=0; i<npts; i++){
-    tau_arr[i] -= tau_0;
+    tau_arr[i] = -tau_arr_backwards[npts-i-1];
+    dtaudx_arr[i] = dtaudx_arr_backwards[npts-i-1];
   }
   
   tau_of_x_spline.create(x_array, tau_arr);
@@ -340,7 +342,12 @@ void RecombinationHistory::solve_for_optical_depth_tau(){
 //====================================================
 
 double RecombinationHistory::tau_of_x(double x) const{
-  return tau_of_x_spline(x);
+  if(x < 0){
+    return tau_of_x_spline(x);
+  }
+  else{
+    return 0.0;
+  }
 }
 
 double RecombinationHistory::dtaudx_of_x(double x) const{
@@ -351,8 +358,12 @@ double RecombinationHistory::dtaudx_of_x(double x) const{
   //=============================================================================
   //...
   //...
-
-  return dtaudx_of_x_spline(x);
+  if(x < 0){
+    return dtaudx_of_x_spline(x);
+  }
+  else{
+    return 0.0;
+  }
 }
 
 double RecombinationHistory::ddtauddx_of_x(double x) const{
@@ -362,12 +373,21 @@ double RecombinationHistory::ddtauddx_of_x(double x) const{
   //=============================================================================
   //...
   //...
-
-  return dtaudx_of_x_spline.deriv_x(x);
+  if(x < 0){
+    return dtaudx_of_x_spline.deriv_x(x);
+  }
+  else{
+    return 0.0;
+  }
 }
 
 double RecombinationHistory::g_tilde_of_x(double x) const{
-  return g_tilde_of_x_spline(x);
+  if(x < 0){
+    return g_tilde_of_x_spline(x);
+  }
+  else{
+    return 0.0;
+  }
 }
 
 double RecombinationHistory::dgdx_tilde_of_x(double x) const{
@@ -377,8 +397,12 @@ double RecombinationHistory::dgdx_tilde_of_x(double x) const{
   //=============================================================================
   //...
   //...
-
-  return g_tilde_of_x_spline.deriv_x(x);
+  if(x < 0){
+    return g_tilde_of_x_spline.deriv_x(x);
+  }
+  else{
+    return 0.0;
+  }
 }
 
 double RecombinationHistory::ddgddx_tilde_of_x(double x) const{
@@ -388,8 +412,12 @@ double RecombinationHistory::ddgddx_tilde_of_x(double x) const{
   //=============================================================================
   //...
   //...
-
-  return g_tilde_of_x_spline.deriv_xx(x);
+  if(x < 0){
+    return g_tilde_of_x_spline.deriv_xx(x);
+  }
+  else{
+    return 0.0;
+  }
 }
 
 double RecombinationHistory::Xe_of_x(double x) const{
