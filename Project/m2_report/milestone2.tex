@@ -55,7 +55,7 @@ In this report, we will study the period of recombination, a rapid transition pe
 
 The calculations will be performed under the assumption that the universe contains no heavier elements than Hydrogen ($Y_p = 0$). We will also be ignoring the event of \textit{reionization}, where the universe became ionized again around $x\approx -2$.
 
-We also wish to pinpoint exactly at what times the events of recombination and last scattering happened. Recombination is more of a period characterized by sharp fall in the free electron fraction than it is a specific event, but we will define it as the point where $X_e = 0.5$. The surface of last scattering is the point in time where most of the photons we oberve today would have last scattered, and corresponds to the point where the visibility function reaches its maximum value.
+We also wish to pinpoint exactly at what times the events of recombination and last scattering happened. Recombination is more of a period characterized by sharp fall in the free electron fraction than it is a specific event, but we will define it as the point where $X_e = 0.5$. The surface of last scattering is the point in time where most of the photons we observe today would have last scattered, and corresponds to the point where the visibility function reaches its maximum value.
 
 
 \section{Theory and method}
@@ -87,7 +87,7 @@ Due to their fondness of confusing notation and immense pleasure in dropping ter
 \begin{equation*}
     \tau^\prime = - \sigma_T\frac{n_{e}(x)}{H(x)}
 \end{equation*}
-with the factor of $c$ lacking. This might be awfully convenient during derivations, but when we at the end of the day require physical quantities in known units, we need a way of reintroducing these missing constants in a consistent way. This is known as dimensionality analysis, and entails looking at the apperant dimensions of the equation, comparing it to the dimensions it \textit{should} have, and inserting constants to make it so. For instance, we can easially see that the RHS of the equation above lacks units corresponding to those of the constant $c$, from the knowledge that $\tau'$ is unitless, and the RHS must therefore be so as well.
+with the factor of $c$ lacking. This might be awfully convenient during derivations, but when we at the end of the day require physical quantities in known units, we need a way of reintroducing these missing constants in a consistent way. This is known as dimensionality analysis, and entails looking at the apparent dimensions of the equation, comparing it to the dimensions it \textit{should} have, and inserting constants to make it so. For instance, we can easily see that the RHS of the equation above lacks units corresponding to those of the constant $c$, from the knowledge that $\tau'$ is unitless, and the RHS must therefore be so as well.
 
 Appendix \ref{sec:appendixA} offers a walkthrough of the dimensional analysis required to reconstruct both the Saha and Peebles equation from their natural-unit forms.
 
@@ -95,11 +95,11 @@ Appendix \ref{sec:appendixA} offers a walkthrough of the dimensional analysis re
 \subsection{Free electron fraction and the Boltzmann equation}
 The most important quantity deciding the optical depth is the free electron density $n_e$, or a very related quantity - the free electron fraction $X_e = \frac{n_e}{n_b}$, where $n_b$ is the baryon density (remember that we assume no heavier elements than Hydrogen). Under the same assumption, we know the baryon density of the universe to be $n_b = \frac{\Omega_{b,0}\rho_{c,0}}{m_ha^3}$ (see \cite{Milestone1}).
 
-The density of any particle species in the universe can be modelled using the Boltzmann equation, presented below on its most general form.
+The density of any particle species in the universe can be modeled using the Boltzmann equation, presented below on its most general form.
 \begin{equation*}
     \dv{f}{t} = C[f]
 \end{equation*}
-Here $f(t, \vec{x}, \vec{p})$ is the distribution function of the species in phase space, and the RHS contains all interactions with other species. During recombination, the interactions of interest taking place is electrons and photons recombining to form hydrogen, releasing a photon, and a photon knocking the electron loose from a hydrogen atom (compton scattering). In other words, the allowed interactions are $e^- + p \leftrightarrow H + \gamma$. The Boltzmann equation applied to this interaction results in a ODE known as the Peebles equation, presented in section \ref{sec:Peebles}. 
+Here $f(t, \vec{x}, \vec{p})$ is the distribution function of the species in phase space, and the RHS contains all interactions with other species. During recombination, the interactions of interest taking place is electrons and photons recombining to form hydrogen, releasing a photon, and a photon knocking the electron loose from a hydrogen atom (Compton scattering). In other words, the allowed interactions are $e^- + p \leftrightarrow H + \gamma$. The Boltzmann equation applied to this interaction results in a ODE known as the Peebles equation, presented in section \ref{sec:Peebles}. 
 
 The Peebles equation is numerically unstable at very early times ($X_e \approx 1$), among other reasons because one of the terms contain a $1-X_e$ term in the divisor. For the earliest intervals, we'll therefore instead employ the Saha equation.
 
@@ -152,7 +152,7 @@ After the Saha regime ends, the solutions will be treated with the full Peebles 
     \dv{X_{e}}{x}=\frac{C_{r}\qty(T_{b})}{H}\qty[\beta\qty(T_{b})\qty(1-X_{e})-n_{H} \alpha^{(2)}\qty(T_{b}) X_{e}^{2}]
 \end{equation}
 
-The equation itself looks the same in natural units, but it contains a series of varaibles shown below, all of which have been rewritten with the proper dimensional analysis shown in appendix \ref{sec:appendixA}.
+The equation itself looks the same in natural units, but it contains a series of variables shown below, all of which have been rewritten with the proper dimensional analysis shown in appendix \ref{sec:appendixA}.
 \begin{align}
     \label{eqn:1x}
     C_{r}\qty(T_{b}) &=\frac{\Lambda_{2 s \rightarrow 1 s}+\Lambda_{\alpha}}{\Lambda_{2 s \rightarrow 1 s}+\Lambda_{\alpha}+\beta^{(2)}\qty(T_{b})} \\
@@ -191,7 +191,7 @@ The \textit{RecombinationHistory} class takes as constructor arguments an instan
 
 \subsection{The optical depth solver}
 With the solution of $X_e$ (and thereby $n_e$) known and splined, the \textit{solve} method calls upon the\\
-\textit{solve\_for\_optical\_depth\_tau} method. This method solves \ref{eqn:tau_ODE} for $\tau(x)$ using the GSL ODESolver implementation over $x\in[-20, 0]$, using $10^5$ points. The only known value of $\tau$ is today, where $\tau(x=0) = 0$, while the initial condition at $\tau(x=-20)$ is not known. For this reason, we substitute $x \rightarrow -x$ in equation \ref{eqn:tau_ODE}, and solve it instead in the reversed interval $x\in[0, 20]$.\footnote{The negative substitution in $x$ means that this is in reality the interval $x\in [0, -20]$, but the ODESolver appears not to allow solving of ODEs with negative timesteps, so the substitution of $x$ is necessary.} Another possible solution is simply to set the initial condition $\tau(x=-20)$ to some arbritrary value, and simply rescale the final solution such by subtracting $\tau(x=0)$. The former solution was chosen because the latter suffer from numerical inaccuracies due to the span of values over many orders of magnitudes.
+\textit{solve\_for\_optical\_depth\_tau} method. This method solves \ref{eqn:tau_ODE} for $\tau(x)$ using the GSL ODESolver implementation over $x\in[-20, 0]$, using $10^5$ points. The only known value of $\tau$ is today, where $\tau(x=0) = 0$, while the initial condition at $\tau(x=-20)$ is not known. For this reason, we substitute $x \rightarrow -x$ in equation \ref{eqn:tau_ODE}, and solve it instead in the reversed interval $x\in[0, 20]$.\footnote{The negative substitution in $x$ means that this is in reality the interval $x\in [0, -20]$, but the ODESolver appears not to allow solving of ODEs with negative timesteps, so the substitution of $x$ is necessary.} Another possible solution is simply to set the initial condition $\tau(x=-20)$ to some arbitrary value, and simply rescale the final solution such by subtracting $\tau(x=0)$. The former solution was chosen because the latter suffer from numerical inaccuracies due to the span of values over many orders of magnitudes.
 
 The solution of $\tau$ is splined, together with its first two derivatives with regards to $x$. The first derivative is known from the ODE, while the second is found using a built-in differentiator in the spline class.
 
@@ -203,9 +203,9 @@ The result of $\tau$ is used to calculate the visibility function $\tilde{g}$ f
 \subsection{Free electron fraction}
 Figure \ref{fig:Xe} shows the evolution of the free electron fraction as function of $x$ for both the Saha approximation, and the full Peebles equation aAll solutions quoted as "using the Peebles equation" still employ the Saha before the "Saha limit" of $X_e < 0.99$). We can see that the solutions diverge shortly after the Saha limit, with the Saha solution quickly falling off towards zero, while the Peebles solution stabilizes towards a value of $X_e(x=0) = 1.9\times 10^{-4}$ today.
 
-The flattening of the free electron fraction represents the freeze out of electrons, where they decouple from the thermal bath. The equilibrium solution of the system predicts an exponential supression of the free electron fraction as the temperature drops, in line with the Saha equation. However, the process loses its efficiency due to the decaying interaction rate, and the freeze out occurs, giving the non-equilibrium value seen from the Peebles solution.
+The flattening of the free electron fraction represents the freeze out of electrons, where they decouple from the thermal bath. The equilibrium solution of the system predicts an exponential suppression of the free electron fraction as the temperature drops, in line with the Saha equation. However, the process loses its efficiency due to the decaying interaction rate, and the freeze out occurs, giving the non-equilibrium value seen from the Peebles solution.
 
-Saha also predicts an earlier point of recombination than Peebles does, at $x = -7.17$ instead of $x = - 7.23$. This is of course simply because it dropps faster to the recombination definition of $X_e = 0.5$. The surface of last scattering is also indicated in the figures, which we'll come back to in section \ref{sec:results:g_tilde}.
+Saha also predicts an earlier point of recombination than Peebles does, at $x = -7.17$ instead of $x = - 7.23$. This is of course simply because it drops faster to the recombination definition of $X_e = 0.5$. The surface of last scattering is also indicated in the figures, which we'll come back to in section \ref{sec:results:g_tilde}.
 
 
 
@@ -220,7 +220,7 @@ Saha also predicts an earlier point of recombination than Peebles does, at $x = 
 \subsection{Optical depth}
 Figure \ref{fig:tau} shows the optical depth $\tau$ as function of $x$, as well as its derivatives in $x$. We see that $\tau(x)$ (apart from per definition falling to zero at $x=0$) exhibits three distinct regions. Looking forward in time from $x=-12$, we see that the early universe is incredibly optically thick. The mean free path was in this era very small, due to the dense plasma soup state the universe found itself in. The optical depth decreases "linearly"\footnote{since its log-plotted against $x$, linear behavior corresponds to exponential dependence on $x$, which again corresponds to power-law dependence in $a$} until around $x=-7.4$, where $X_e$ starts undergoing a sharp decline due to recombination. During this region, we see a sharp decline in the optical depth as the universe changes from a coupled soup state to one consisting almost entirely of neutral Hydrogen (as well as a decent fraction of Helium, which we won't consider). Half-way through this rapid drop, around $x=-6.9$, $\tau$ crosses the value of $1$, which is known as the surface of last scattering, and represents the \textit{most probable} point of origin for any photon observed today. As $X_e$ flattens out, $\tau$ again enters a new phase of less steep decline, before falling to zero today.
 
-Looking back at equation \ref{eqn:tau_ODE}, we see that $-\tau'(x)$ is simply the ratio between what's called the \textit{scattering rate} $n_e\sigma_T$ \cite[p. 72]{ModernCosmology2003}, and the hubble parameter $H(x)$. The Hubble parameter has the simple behavior of $H\propto \exp{-2x}$ for $x<-8.6$ and $H\propto \exp{-1.5x}$ for $x>-8.6$ (see \cite{Milestone1}), while the behavior of the free electron fraction can be seen in appendix \ref{sec:appendixC}. It's easy to see that the behavior of $-\tau(x)$ around the event of recombination very much corresponds to the behavior of $n_e(x)$ (or the scattering rate, if you wish, which is only different up to a constant).
+Looking back at equation \ref{eqn:tau_ODE}, we see that $-\tau'(x)$ is simply the ratio between what's called the \textit{scattering rate} $n_e\sigma_T$ \cite[p. 72]{ModernCosmology2003}, and the Hubble parameter $H(x)$. The Hubble parameter has the simple behavior of $H\propto \exp{-2x}$ for $x<-8.6$ and $H\propto \exp{-1.5x}$ for $x>-8.6$ (see \cite{Milestone1}), while the behavior of the free electron fraction can be seen in appendix \ref{sec:appendixC}. It's easy to see that the behavior of $-\tau(x)$ around the event of recombination very much corresponds to the behavior of $n_e(x)$ (or the scattering rate, if you wish, which is only different up to a constant).
 
 
 
@@ -237,7 +237,7 @@ Figure \ref{fig:g_tilde} shows the visibility function $\tilde{g}$ and its deriv
 
 The strong peaking of the visibility function is important to us, as it means all the photons emitted (and observed today as the CMB) originated from the same time period, holding the blueprints to the fluctuations in the universe at one point in time very long ago.
 
-The derivatives of $\tilde{g}$ are pretty self-explanatory, as the shape of $\tilde{g}$ is very simple (a somewhat skewed gaussian). The first derivative shows the asymetry of $\tilde{g}$, as we can see it being much more strongly peaked before LS than after. The second derivative tells a similar story, having one positive peak at each side of LS, the first one being much more prominent, speaking to a steeper convex shape in $\tilde{g}$.
+The derivatives of $\tilde{g}$ are pretty self-explanatory, as the shape of $\tilde{g}$ is very simple (a somewhat skewed gaussian). The first derivative shows the asymmetry of $\tilde{g}$, as we can see it being much more strongly peaked before LS than after. The second derivative tells a similar story, having one positive peak at each side of LS, the first one being much more prominent, speaking to a steeper convex shape in $\tilde{g}$.
 
 
 \begin{figure}[H]
@@ -377,7 +377,7 @@ Our only constant containing temperature is $k_B$, meaning the dimension of temp
 \begin{equation*}
     [\alpha^{(2)}][k_B^{1/2}] = M^{-2}
 \end{equation*}
-The remainding work must be done by combinations of $c$ and $\hbar$, as not to reintroduce temperature. It's not hard to see that this can be achived by
+The remaining work must be done by combinations of $c$ and $\hbar$, as not to reintroduce temperature. It's not hard to see that this can be achieved by
 \begin{equation*}
     [\hbar^n][c^m] = L^3t^{-1}M^2  \quad\Rightarrow\quad n=2,\ m=-1
 \end{equation*}
@@ -401,9 +401,9 @@ As before, the only way of getting rid of temperature is $k_B$, meaning that $\b
 \begin{equation*}
     [\beta][k_B^{3/2}] = L^6t^{-4}M^3
 \end{equation*}
-In order to achive dimensions of $t^{-1}$, we need a factor which holds units of $L^{-6}t^{-3}M^3 = (L^2t^{-1}M)^{-3}$. We recognize the units inside the paranthesis to be the units of $\hbar$, meaning that $\beta$ needs a factor of $\hbar^{-3}$ to have the right units.
+In order to achieve dimensions of $t^{-1}$, we need a factor which holds units of $L^{-6}t^{-3}M^3 = (L^2t^{-1}M)^{-3}$. We recognize the units inside the parenthesis to be the units of $\hbar$, meaning that $\beta$ needs a factor of $\hbar^{-3}$ to have the right units.
 
-The exponential term in $\beta$ needs to unitless. This is, again, achived by multiplying the temperature term by $k_B$.
+The exponential term in $\beta$ needs to unitless. This is, again, achieved by multiplying the temperature term by $k_B$.
 
 The correct expression for $\beta$ is then
 \begin{equation*}
@@ -413,9 +413,9 @@ The correct expression for $\beta$ is then
 
 
 \section{Saha-Peebles transition stability}
-Figure \ref{fig:num_stab} shows $X_e$, $\tau$ and its derivatives as function of $x$ over a small interval around the Saha limit. From the first figure we see that, although the transition from the Saha solution to the Peebles solution is continous, there is a slight change in direction just at the transition limit.
+Figure \ref{fig:num_stab} shows $X_e$, $\tau$ and its derivatives as function of $x$ over a small interval around the Saha limit. From the first figure we see that, although the transition from the Saha solution to the Peebles solution is continuous, there is a slight change in direction just at the transition limit.
 
-This seems to be inconsequential to both $\tau$ and $\tau'$, but appears to give rise to some unfortunate squiggles in $\tau''$. A potential solution could be moving the Saha limit even further back, where the transition between the Saha and Peebles solution should be less noticable, if the Peebles equation doesn't run into numerical stability issues.
+This seems to be inconsequential to both $\tau$ and $\tau'$, but appears to give rise to some unfortunate squiggles in $\tau''$. A potential solution could be moving the Saha limit even further back, where the transition between the Saha and Peebles solution should be less noticeable, if the Peebles equation doesn't run into numerical stability issues.
 
 \begin{figure}[H]
     \centering
