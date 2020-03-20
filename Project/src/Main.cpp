@@ -43,15 +43,14 @@ int main(int argc, char **argv){
   RecombinationHistory rec(&cosmo, Yp);
   rec.solve();
   rec.info();
-
-  // Output recombination quantities
   rec.output("../data/recombination.txt");
 
-  // RecombinationHistory rec_saha(&cosmo, Yp);
-  // rec_saha.set_saha_limit(0.0);
-  // rec_saha.solve();
-  // rec_saha.info();
-  // rec_saha.output("../data/recombination_saha.txt");
+  // Solve the recombination history using the Saha approximation the entire way.
+  RecombinationHistory rec_saha(&cosmo, Yp);
+  rec_saha.set_saha_limit(0.0);  // Setting the Xe limit of ending Saha regime to 0.
+  rec_saha.solve();
+  rec_saha.info();
+  rec_saha.output("../data/recombination_saha.txt"); // Store data in a different file.
 
   // Remove when module is completed
   return 0;
