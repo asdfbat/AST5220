@@ -60,7 +60,7 @@ We also wish to pinpoint exactly at what times the events of recombination and l
 
 \section{Theory and method}
 \subsection{The visibility function}
-Our main goal is to model the visibility function $\tilde{g}(x)$ from the early universe until today, with special focus on the epoch of recombination. The visibility function is a probability function, representing the probability of any photon (as of today) to last have scattered at time $x$. If you asked random photons arriving from space when they last met a stranger, their answers would follow the distribution $\tilde{g}(x)$. It is an explicit function of the optical depth $\tau$, and its derivative, as
+Our main goal is to model the visibility function $\tilde{g}(x)$ from the early universe until today, with special focus on the epoch of recombination. The visibility function is a probability function, representing the probability of any photon (as of today) to last have scattered at time $x$. If you asked random photons arriving from space when they last met a stranger, their answers would follow the distribution $\tilde{g}(x)$. It is an explicit function of the optical depth $\tau$ and its derivative, as
 \begin{equation}\label{eqn:g_tilde}
     \tilde{g}(x) = -\tau^{\prime} e^{-\tau}
 \end{equation}
@@ -99,7 +99,7 @@ The density of any particle species in the universe can be modelled using the Bo
 \begin{equation*}
     \dv{f}{t} = C[f]
 \end{equation*}
-Here $f(t, \vec{x}, \vec{p})$ is the distribution function of the species in phase space, and the RHS contains all interactions with other species. During recombination, the interactions of interest taking place is electrons and photons recombining to form hydrogen, releasing a photon, and a photon knocking the electron loose from a hydrogen atom (compton scattering). In other words, the allowed interactions are $e^- + p \leftrightarrow H + \gamma$. The Boltzmann equation applied to this interaction (see derivation in \cite{ModernCosmology2003}) results in a ODE known as the Peebles equation, presented in section \ref{sec:Peebles}. 
+Here $f(t, \vec{x}, \vec{p})$ is the distribution function of the species in phase space, and the RHS contains all interactions with other species. During recombination, the interactions of interest taking place is electrons and photons recombining to form hydrogen, releasing a photon, and a photon knocking the electron loose from a hydrogen atom (compton scattering). In other words, the allowed interactions are $e^- + p \leftrightarrow H + \gamma$. The Boltzmann equation applied to this interaction results in a ODE known as the Peebles equation, presented in section \ref{sec:Peebles}. 
 
 The Peebles equation is numerically unstable at very early times ($X_e \approx 1$), among other reasons because one of the terms contain a $1-X_e$ term in the divisor. For the earliest intervals, we'll therefore instead employ the Saha equation.
 
@@ -109,7 +109,7 @@ The Saha equation is an approximation of the Boltzmann/Peebles equation for $X_e
 \begin{equation*}
     \frac{n_e n_p}{n_H} \approx \qty(\frac{n_e n_p}{n_H})_{eq}
 \end{equation*}
-In other words, the system is very close to equilibrium, which holds for $X_e\approx 1$. The derivation of the natural-units Saha equation can be found in \cite{ModernCosmology2003}, and the dimensional analysis required to get it in full fledged form is shown in appendix \ref{sec:appendixA}. The full equation reads
+In other words, the system is very close to equilibrium, which holds for $X_e\approx 1$. The derivation of the natural-units Saha equation can be found in \cite[p. 70]{ModernCosmology2003}, and the dimensional analysis required to get it in full fledged form is shown in appendix \ref{sec:appendixA}. The full equation reads
 
 \begin{equation}\label{eqn:Saha}
     \frac{X_{e}^{2}}{1-X_{e}} = A\ , \quad A = \frac{1}{n_{b}\hbar^3}\qty(\frac{m_{e} k_B T_{b}}{2 \pi})^{3 / 2} e^{-\epsilon_{0} / k_B T_{b}}
@@ -146,7 +146,7 @@ avoiding any numerical stability issues without meaningful loss in precision.
 
 
 \subsection{The Peebles equation}\label{sec:Peebles}
-After the Saha regime ends, the solutions will be treated with the full Peebles equation. The equation can be found on its natural-unit form in \cite{ModernCosmology2003} as
+After the Saha regime ends, the solutions will be treated with the full Peebles equation. The equation can be found on its natural-unit form in \cite[p. 71]{ModernCosmology2003} as
 \begin{equation}
     \label{eqn:Peebles}
     \dv{X_{e}}{x}=\frac{C_{r}\qty(T_{b})}{H}\qty[\beta\qty(T_{b})\qty(1-X_{e})-n_{H} \alpha^{(2)}\qty(T_{b}) X_{e}^{2}]
@@ -203,7 +203,7 @@ The result of $\tau$ is used to calculate the visibility function $\tilde{g}$ f
 \subsection{Free electron fraction}
 Figure \ref{fig:Xe} shows the evolution of the free electron fraction as function of $x$ for both the Saha approximation, and the full Peebles equation aAll solutions quoted as "using the Peebles equation" still employ the Saha before the "Saha limit" of $X_e < 0.99$). We can see that the solutions diverge shortly after the Saha limit, with the Saha solution quickly falling off towards zero, while the Peebles solution stabilizes towards a value of $X_e(x=0) = 1.9\times 10^{-4}$ today.
 
-The flattening of the free electron fraction represents the freeze out of electrons, where they decouple from the thermal bath. The equilibrium solution of the system predicts an exponential supression of the free electron fraction, in line with the Saha equation. However, the process loses its efficiency due to the decaying interaction rate, and the freeze out occurs, giving the non-equilibrium value seen from the Peebles solution.
+The flattening of the free electron fraction represents the freeze out of electrons, where they decouple from the thermal bath. The equilibrium solution of the system predicts an exponential supression of the free electron fraction as the temperature drops, in line with the Saha equation. However, the process loses its efficiency due to the decaying interaction rate, and the freeze out occurs, giving the non-equilibrium value seen from the Peebles solution.
 
 Saha also predicts an earlier point of recombination than Peebles does, at $x = -7.17$ instead of $x = - 7.23$. This is of course simply because it dropps faster to the recombination definition of $X_e = 0.5$. The surface of last scattering is also indicated in the figures, which we'll come back to in section \ref{sec:results:g_tilde}.
 
@@ -220,7 +220,8 @@ Saha also predicts an earlier point of recombination than Peebles does, at $x = 
 \subsection{Optical depth}
 Figure \ref{fig:tau} shows the optical depth $\tau$ as function of $x$, as well as its derivatives in $x$. We see that $\tau(x)$ (apart from per definition falling to zero at $x=0$) exhibits three distinct regions. Looking forward in time from $x=-12$, we see that the early universe is incredibly optically thick. The mean free path was in this era very small, due to the dense plasma soup state the universe found itself in. The optical depth decreases "linearly"\footnote{since its log-plotted against $x$, linear behavior corresponds to exponential dependence on $x$, which again corresponds to power-law dependence in $a$} until around $x=-7.4$, where $X_e$ starts undergoing a sharp decline due to recombination. During this region, we see a sharp decline in the optical depth as the universe changes from a coupled soup state to one consisting almost entirely of neutral Hydrogen (as well as a decent fraction of Helium, which we won't consider). Half-way through this rapid drop, around $x=-6.9$, $\tau$ crosses the value of $1$, which is known as the surface of last scattering, and represents the \textit{most probable} point of origin for any photon observed today. As $X_e$ flattens out, $\tau$ again enters a new phase of less steep decline, before falling to zero today.
 
-TODO: Write some about the derivatives.
+Looking back at equation \ref{eqn:tau_ODE}, we see that $-\tau'(x)$ is simply the ratio between what's called the \textit{scattering rate} $n_e\sigma_T$ \cite[p. 72]{ModernCosmology2003}, and the hubble parameter $H(x)$. The Hubble parameter has the simple behavior of $H\propto \exp{-2x}$ for $x<-8.6$ and $H\propto \exp{-1.5x}$ for $x>-8.6$ (see \cite{Milestone1}), while the behavior of the free electron fraction can be seen in appendix \ref{sec:appendixC}. It's easy to see that the behavior of $-\tau(x)$ around the event of recombination very much corresponds to the behavior of $n_e(x)$ (or the scattering rate, if you wish, which is only different up to a constant).
+
 
 
 \begin{figure}[H]
@@ -232,7 +233,11 @@ TODO: Write some about the derivatives.
 
 
 \subsection{Visibility function}\label{sec:results:g_tilde}
-Figure \ref{fig:g_tilde} shows the visibility function $g$ and its derivatives as function of $x$. 
+Figure \ref{fig:g_tilde} shows the visibility function $\tilde{g}$ and its derivatives as function of $x$. As previously stated, the visibility function is a probability distribution of when photons last scattered. As we can see, it is very strongly peaked around the event of last scattering (LS) at $x = -6.98$, this event being defined as the peak of $\tilde{g}$. The visibility function is very steeply sloped before LS, and somewhat slacker after the event. This means a photon is more likely to have scattered again somewhat after LS than it is to have passed through LS without scattering. Looking no further back than the event of recombination, at $x = -7.17$, the probability of having last scattered has fallen to virtually zero.
+
+The strong peaking of the visibility function is important to us, as it means all the photons emitted (and observed today as the CMB) originated from the same time period, holding the blueprints to the fluctuations in the universe at one point in time very long ago.
+
+The derivatives of $\tilde{g}$ are pretty self-explanatory, as the shape of $\tilde{g}$ is very simple (a somewhat skewed gaussian). The first derivative shows the asymetry of $\tilde{g}$, as we can see it being much more strongly peaked before LS than after. The second derivative tells a similar story, having one positive peak at each side of LS, the first one being much more prominent, speaking to a steeper convex shape in $\tilde{g}$.
 
 
 \begin{figure}[H]
@@ -242,6 +247,9 @@ Figure \ref{fig:g_tilde} shows the visibility function $g$ and its derivatives a
     \label{fig:g_tilde}
 \end{figure}
 
+
+
+\newpage
 \appendix
 \section{Dimensionality analysis}\label{sec:appendixA}
 Dimensionality analysis is a powerful tool with many purposes. Here, we will simply focus on restoring lost constants from equations written in natural units. Although there exists rigorous ways of doing this by setting up systems of equations, this can be tiresome, and it was in our case found sufficient to simply apply some sound logic and qualified guesses.
@@ -414,6 +422,16 @@ This seems to be inconsequential to both $\tau$ and $\tau'$, but appears to give
     \includegraphics[scale=0.5]{../m2_figs/num_stab.pdf}
     \caption{Figure showing extremely zoomed in plots of $X_e$ as well as $\tau$ and its derivatives, around the transition point between the Saha and Peebles equations.}
     \label{fig:num_stab}
+\end{figure}
+
+
+
+\section{Electron number density} \label{sec:appendixC}
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.5]{../m2_figs/ne.pdf}
+    \caption{}
+    \label{}
 \end{figure}
 
 
