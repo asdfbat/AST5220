@@ -53,7 +53,6 @@ int main(int argc, char **argv){
   rec_saha.output("../data/recombination_saha.txt"); // Store data in a different file.
 
   // Remove when module is completed
-  return 0;
 
   //=========================================================================
   // Module III
@@ -61,13 +60,15 @@ int main(int argc, char **argv){
  
   // Solve the perturbations
   Perturbations pert(&cosmo, &rec);
+  pert.solve();
   pert.info();
+
+  
   
   // Output perturbation quantities
-  double kvalue = 0.01 * Constants.Mpc;
-  pert.output(kvalue, "perturbations_k0.01.txt");
-  
-  // Remove when module is completed
+  pert.output(0.1/Constants.Mpc, "../data/perturbations_k0.1.txt");
+  pert.output(0.01/Constants.Mpc, "../data/perturbations_k0.01.txt");
+  pert.output(0.001/Constants.Mpc, "../data/perturbations_k0.001.txt");  
   return 0;
   
   //=========================================================================

@@ -12,6 +12,7 @@
 
 using Vector   = std::vector<double>;
 using Vector2D = std::vector<Vector>;
+using Vector3D = std::vector<Vector2D>;
 
 class Perturbations{
   private:
@@ -20,14 +21,14 @@ class Perturbations{
     RecombinationHistory *rec  = nullptr;
    
     // The scales we integrate over
-    const int n_k        = 100;
+    const int n_k        = 10;
     const double k_min   = Constants.k_min;
     const double k_max   = Constants.k_max;
     
     // Start and end of the time-integration
-    const int n_x        = 1000;
+    const int n_x        = 5000;
     const double x_start = Constants.x_start;
-    const double x_end   = Constants.x_end;
+    const double x_end   = 0;
 
     // Below is a full list of splines you probably need, 
     // but you only need to make the splines you will need
