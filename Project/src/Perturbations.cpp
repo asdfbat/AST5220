@@ -281,14 +281,14 @@ void Perturbations::integrate_perturbations(){
   }
 
 
-  delta_cdm_spline.create(x_array_full, k_array, delta_cdm_array_flat, "delta_cdm_spline");
-  delta_b_spline.create(x_array_full, k_array, delta_b_array_flat, "delta_b_spline");
-  v_cdm_spline.create(x_array_full, k_array, v_cdm_array_flat, "v_cdm_spline");
-  v_b_spline.create(x_array_full, k_array, v_b_array_flat, "v_b_spline");
-  Phi_spline.create(x_array_full, k_array, Phi_array_flat, "Phi_spline");
-  Theta0_spline.create(x_array_full, k_array, Theta0_array_flat, "Theta0_spline");
-  Theta1_spline.create(x_array_full, k_array, Theta1_array_flat, "Theta1_spline");
-  Theta2_spline.create(x_array_full, k_array, Theta2_array_flat, "Theta2_spline");
+  delta_cdm_spline.create(x_array_full, log_k_array, delta_cdm_array_flat, "delta_cdm_spline");
+  delta_b_spline.create(x_array_full, log_k_array, delta_b_array_flat, "delta_b_spline");
+  v_cdm_spline.create(x_array_full, log_k_array, v_cdm_array_flat, "v_cdm_spline");
+  v_b_spline.create(x_array_full, log_k_array, v_b_array_flat, "v_b_spline");
+  Phi_spline.create(x_array_full, log_k_array, Phi_array_flat, "Phi_spline");
+  Theta0_spline.create(x_array_full, log_k_array, Theta0_array_flat, "Theta0_spline");
+  Theta1_spline.create(x_array_full, log_k_array, Theta1_array_flat, "Theta1_spline");
+  Theta2_spline.create(x_array_full, log_k_array, Theta2_array_flat, "Theta2_spline");
 }
 
 //====================================================
@@ -685,37 +685,48 @@ int Perturbations::rhs_full_ode(double x, double k, const double *y, double *dyd
 //====================================================
 
 double Perturbations::get_delta_cdm(const double x, const double k) const{
-  return delta_cdm_spline(x,k);
+  double log_k = log(k);
+  return delta_cdm_spline(x,log_k);
 }
 double Perturbations::get_delta_b(const double x, const double k) const{
-  return delta_b_spline(x,k);
+  double log_k = log(k);
+  return delta_b_spline(x,log_k);
 }
 double Perturbations::get_v_cdm(const double x, const double k) const{
-  return v_cdm_spline(x,k);
+  double log_k = log(k);
+  return v_cdm_spline(x,log_k);
 }
 double Perturbations::get_v_b(const double x, const double k) const{
-  return v_b_spline(x,k);
+  double log_k = log(k);
+  return v_b_spline(x,log_k);
 }
 double Perturbations::get_Phi(const double x, const double k) const{
-  return Phi_spline(x,k);
+  double log_k = log(k);
+  return Phi_spline(x,log_k);
 }
 double Perturbations::get_Psi(const double x, const double k) const{
-  return Psi_spline(x,k);
+  double log_k = log(k);
+  return Psi_spline(x,log_k);
 }
 double Perturbations::get_Pi(const double x, const double k) const{
-  return Pi_spline(x,k);
+  double log_k = log(k);
+  return Pi_spline(x,log_k);
 }
 double Perturbations::get_Source_T(const double x, const double k) const{
-  return ST_spline(x,k);
+  double log_k = log(k);
+  return ST_spline(x,log_k);
 }
 double Perturbations::get_Source_E(const double x, const double k) const{
-  return SE_spline(x,k);
+  double log_k = log(k);
+  return SE_spline(x,log_k);
 }
 double Perturbations::get_Theta(const double x, const double k, const int ell) const{
+  double log_k = log(k);
+
   if(ell == 0)
-    return Theta0_spline(x,k);
+    return Theta0_spline(x,log_k);
   else if(ell == 1)
-    return Theta1_spline(x,k);
+    return Theta1_spline(x,log_k);
   else
     return 0;
   // return Theta_spline[ell](x,k);
