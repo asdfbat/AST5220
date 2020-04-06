@@ -314,7 +314,6 @@ Vector Perturbations::set_ic_after_tight_coupling(
   const double &v_b_tc          =  y_tc[Constants.ind_vb_tc];
   const double &Phi_tc          =  y_tc[Constants.ind_Phi_tc];
   const double *Theta_tc        = &y_tc[Constants.ind_start_theta_tc];
-  const double *Nu_tc           = &y_tc[Constants.ind_start_nu_tc];
 
   // References to the quantities we are going to set
   double &delta_cdm       =  y[Constants.ind_deltacdm_tc];
@@ -323,8 +322,6 @@ Vector Perturbations::set_ic_after_tight_coupling(
   double &v_b             =  y[Constants.ind_vb_tc];
   double &Phi             =  y[Constants.ind_Phi_tc];
   double *Theta           = &y[Constants.ind_start_theta_tc];
-  double *Theta_p         = &y[Constants.ind_start_thetap_tc];
-  double *Nu              = &y[Constants.ind_start_nu_tc];
 
   //=============================================================================
   // TODO: fill in the initial conditions for the full equation system below
@@ -343,17 +340,7 @@ Vector Perturbations::set_ic_after_tight_coupling(
   // ...
   // ...
 
-  // SET: Photon polarization perturbations (Theta_p_ell)
-  if(polarization){
-    // ...
-    // ...
-  }
-
-  // SET: Neutrino perturbations (N_ell)
-  if(neutrinos){
-    // ...
-    // ...
-  }
+ 
 
   return y;
 }
@@ -543,8 +530,6 @@ int Perturbations::rhs_full_ode(double x, double k, const double *y, double *dyd
   const double &v_b             =  y[Constants.ind_vb];
   const double &Phi             =  y[Constants.ind_Phi];
   const double *Theta           = &y[Constants.ind_start_theta];
-  const double *Theta_p         = &y[Constants.ind_start_thetap];
-  const double *Nu              = &y[Constants.ind_start_nu];
 
   // References to the quantities we are going to set in the dydx array
   double &ddelta_cdmdx    =  dydx[Constants.ind_deltacdm];
@@ -553,8 +538,6 @@ int Perturbations::rhs_full_ode(double x, double k, const double *y, double *dyd
   double &dv_bdx          =  dydx[Constants.ind_vb];
   double &dPhidx          =  dydx[Constants.ind_Phi];
   double *dThetadx        = &dydx[Constants.ind_start_theta];
-  double *dTheta_pdx      = &dydx[Constants.ind_start_thetap];
-  double *dNudx           = &dydx[Constants.ind_start_nu];
 
   // Cosmological parameters and variables
   // double Hp = cosmo->Hp_of_x(x);
@@ -577,19 +560,6 @@ int Perturbations::rhs_full_ode(double x, double k, const double *y, double *dyd
   // ...
   // ...
 
-  // SET: Photon polarization multipoles (Theta_p_ell)
-  if(polarization){
-    // ...
-    // ...
-    // ...
-  }
-
-  // SET: Neutrino mutlipoles (Nu_ell)
-  if(neutrinos){
-    // ...
-    // ...
-    // ...
-  }
 
   return GSL_SUCCESS;
 }
@@ -634,12 +604,7 @@ double Perturbations::get_Theta(const double x, const double k, const int ell) c
     return 0;
   // return Theta_spline[ell](x,k);
 }
-double Perturbations::get_Theta_p(const double x, const double k, const int ell) const{
-  return Theta_p_spline[ell](x,k);
-}
-double Perturbations::get_Nu(const double x, const double k, const int ell) const{
-  return Nu_spline[ell](x,k);
-}
+
 
 //====================================================
 // Print some useful info about the class
