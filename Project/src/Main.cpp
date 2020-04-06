@@ -13,8 +13,10 @@ int main(int argc, char **argv){
 
   // Background parameters
   double h           = 0.7;
-  double OmegaB      = 0.046;
-  double OmegaCDM    = 0.224;
+  // double OmegaB      = 0.046;
+  // double OmegaCDM    = 0.224;
+  double OmegaCDM    = 0.45;
+  double OmegaB      = 0.05;
   double Neff        = 3.046;
   double TCMB        = 2.725;
 
@@ -66,9 +68,7 @@ int main(int argc, char **argv){
   
   
   // Output perturbation quantities
-  printf("HELLO!\n");
   pert.output(0.1/Constants.Mpc, "../data/perturbations_k0.1.txt");
-  printf("HELLO!\n");
   pert.output(0.01/Constants.Mpc, "../data/perturbations_k0.01.txt");
   pert.output(0.001/Constants.Mpc, "../data/perturbations_k0.001.txt");  
   return 0;
