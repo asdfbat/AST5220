@@ -13,10 +13,8 @@ int main(int argc, char **argv){
 
   // Background parameters
   double h           = 0.7;
-  // double OmegaB      = 0.046;
-  // double OmegaCDM    = 0.224;
-  double OmegaCDM    = 0.45;
-  double OmegaB      = 0.05;
+  double OmegaB      = 0.046;
+  double OmegaCDM    = 0.224;
   double Neff        = 3.046;
   double TCMB        = 2.725;
 
