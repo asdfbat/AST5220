@@ -66,7 +66,9 @@ int main(int argc, char **argv){
   
   
   // Output perturbation quantities
+  printf("HELLO!\n");
   pert.output(0.1/Constants.Mpc, "../data/perturbations_k0.1.txt");
+  printf("HELLO!\n");
   pert.output(0.01/Constants.Mpc, "../data/perturbations_k0.01.txt");
   pert.output(0.001/Constants.Mpc, "../data/perturbations_k0.001.txt");  
   return 0;

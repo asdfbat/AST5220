@@ -39,22 +39,26 @@ void Perturbations::integrate_perturbations(){
   // quadratic or a logarithmic spacing
   //===================================================================
   Vector k_array = Utils::linspace(k_min, k_max, n_k);
+  Vector x_array_full = Utils::linspace(x_start, x_end, n_x);
 
   Vector2D delta_cdm_array(n_x, Vector(n_k));
   Vector2D delta_b_array(n_x, Vector(n_k));
   Vector2D v_cdm_array(n_x, Vector(n_k));
   Vector2D v_b_array(n_x, Vector(n_k));
   Vector2D Phi_array(n_x, Vector(n_k));
-  Vector3D Theta_array(Constants.n_ell_theta, Vector2D(n_x, Vector(n_k)));
+  Vector2D Theta0_array(n_x, Vector(n_k));
+  Vector2D Theta1_array(n_x, Vector(n_k));
+  // Vector3D Theta_array(Constants.n_ell_theta, Vector2D(n_x, Vector(n_k)));
 
   Vector delta_cdm_array_flat(n_x*n_k);
   Vector delta_b_array_flat(n_x*n_k);
   Vector v_cdm_array_flat(n_x*n_k);
   Vector v_b_array_flat(n_x*n_k);
   Vector Phi_array_flat(n_x*n_k);
-  Vector2D Theta_array_flat(Constants.n_ell_theta, Vector(n_x*n_k));
+  Vector Theta0_array_flat(n_x*n_k);
+  Vector Theta1_array_flat(n_x*n_k);
+  // Vector2D Theta_array_flat(Constants.n_ell_theta, Vector(n_x*n_k));
 
-  Vector x_array_full = Utils::linspace(x_start, x_end, n_x);
 
   // Loop over all wavenumbers
   for(int ik = 0; ik < n_k; ik++){
@@ -65,7 +69,7 @@ void Perturbations::integrate_perturbations(){
     }
 
     // Current value of k
-    double k = k_array[ik];
+    double k = k_array.at(ik);
 
     // Find value to integrate to
     double x_end_tight = get_tight_coupling_time(k);
@@ -94,8 +98,8 @@ void Perturbations::integrate_perturbations(){
     // ...
     // ...
     // ...
-    Vector x_array_full = Utils::linspace(x_start, x_end, n_x);
     Vector x_array_tc = Utils::linspace(x_start, x_end_tight, idx_end_tight);
+
     ODESolver ode;
     ode.solve(dydx_tight_coupling, x_array_tc, y_tight_coupling_ini);
     Vector temp_delta_cdm = ode.get_data_by_component(Constants.ind_deltacdm_tc);
@@ -103,41 +107,42 @@ void Perturbations::integrate_perturbations(){
     Vector temp_v_cdm     = ode.get_data_by_component(Constants.ind_vcdm_tc);
     Vector temp_v_b       = ode.get_data_by_component(Constants.ind_vb_tc);
     Vector temp_Phi       = ode.get_data_by_component(Constants.ind_Phi_tc);
-    Vector2D temp_Theta(Constants.n_ell_theta_tc, Vector(idx_end_tight));
+    Vector temp_Theta0    = ode.get_data_by_component(Constants.ind_start_theta_tc);
+    Vector temp_Theta1    = ode.get_data_by_component(Constants.ind_start_theta_tc + 1);
+    // Vector2D temp_Theta(Constants.n_ell_theta_tc, Vector(idx_end_tight));
 
-    for(int j=0; j<Constants.n_ell_theta_tc; j++){
-      temp_Theta[j] = ode.get_data_by_component(Constants.ind_start_theta_tc + j);
-    }
+    // for(int j=0; j<Constants.n_ell_theta_tc; j++){
+    //   temp_Theta[j] = ode.get_data_by_component(Constants.ind_start_theta_tc + j);
+    // }
     // for(int i=0; i<n_x; i++){
     //   printf("x=%e, Theta0= %e, Theta1= %e, Phi= %e, Dcmb= %e, vcdm= %e\n", x_arr[i], temp_Theta[0][i], temp_Theta[1][i], temp_Phi[i], temp_delta_cdm[i], temp_v_cdm[i]);
     // }
 
     for(int i=0; i<idx_end_tight; i++){
-      delta_cdm_array[i][ik] = temp_delta_cdm[i];
-      delta_b_array[i][ik]   = temp_delta_b[i];
-      v_cdm_array[i][ik]     = temp_v_cdm[i];
-      v_b_array[i][ik]       = temp_v_b[i];
-      Phi_array[i][ik]       = temp_Phi[i];
-      for(int j=0; j<Constants.n_ell_theta_tc; j++){
-        Theta_array[j][i][ik] = temp_Theta[j][i];
-      }
+      delta_cdm_array.at(i).at(ik) = temp_delta_cdm.at(i);
+      delta_b_array.at(i).at(ik)   = temp_delta_b.at(i);
+      v_cdm_array.at(i).at(ik)     = temp_v_cdm.at(i);
+      v_b_array.at(i).at(ik)       = temp_v_b.at(i);
+      Phi_array.at(i).at(ik)       = temp_Phi.at(i);
+      Theta0_array.at(i).at(ik)    = temp_Theta0.at(i);
+      Theta1_array.at(i).at(ik)    = temp_Theta1.at(i);
+      // for(int j=0; j<Constants.n_ell_theta_tc; j++){
+      //   Theta_array[j][i][ik] = temp_Theta[j][i];
+      // }
     }
 
 
     for(int i=idx_end_tight; i<n_x; i++){
-      delta_cdm_array[i][ik] = temp_delta_cdm[idx_end_tight-1];
-      delta_b_array[i][ik]   = temp_delta_b[idx_end_tight-1];
-      v_cdm_array[i][ik]     = temp_v_cdm[idx_end_tight-1];
-      v_b_array[i][ik]       = temp_v_b[idx_end_tight-1];
-      Phi_array[i][ik]       = temp_Phi[idx_end_tight-1];
-      for(int j=0; j<Constants.n_ell_theta_tc; j++){
-        Theta_array[j][i][ik] = temp_Theta[j][idx_end_tight-1];
-      }
-    }
-
-    for(int i=0; i<n_x; i++){
-      if(i<50)
-      printf("%f %e\n", x_array_full[i], delta_cdm_array[i][ik]);
+      delta_cdm_array.at(i).at(ik) = temp_delta_cdm.at(idx_end_tight-1);
+      delta_b_array.at(i).at(ik)   = temp_delta_b.at(idx_end_tight-1);
+      v_cdm_array.at(i).at(ik)     = temp_v_cdm.at(idx_end_tight-1);
+      v_b_array.at(i).at(ik)       = temp_v_b.at(idx_end_tight-1);
+      Phi_array.at(i).at(ik)       = temp_Phi.at(idx_end_tight-1);
+      Theta0_array.at(i).at(ik)    = temp_Theta0.at(idx_end_tight-1);
+      Theta1_array.at(i).at(ik)    = temp_Theta1.at(idx_end_tight-1);
+      // for(int j=0; j<Constants.n_ell_theta_tc; j++){
+      //   Theta_array[j][i][ik] = temp_Theta[j][idx_end_tight-1];
+      // }
     }
 
     //===================================================================
@@ -194,30 +199,57 @@ void Perturbations::integrate_perturbations(){
 
   for(int j=0; j<n_k; j++){
     for(int i=0; i<n_x; i++){
-      delta_cdm_array_flat[j*n_x + i] = delta_cdm_array[i][j];
-      delta_b_array_flat[j*n_x + i] = delta_b_array[i][j];
-      v_cdm_array_flat[j*n_x + i] = v_cdm_array[i][j];
-      v_b_array_flat[j*n_x + i] = v_b_array[i][j];
-      Phi_array_flat[j*n_x + i] = Phi_array[i][j];
-      for(int k=0; k<Constants.n_ell_theta_tc; k++){
-        Theta_array_flat[k][j*n_x + i] = Theta_array[k][i][j];
-      }
+      delta_cdm_array_flat.at(j*n_x + i) = delta_cdm_array.at(i).at(j);
+      delta_b_array_flat.at(j*n_x + i) = delta_b_array.at(i).at(j);
+      v_cdm_array_flat.at(j*n_x + i) = v_cdm_array.at(i).at(j);
+      v_b_array_flat.at(j*n_x + i) = v_b_array.at(i).at(j);
+      Phi_array_flat.at(j*n_x + i) = Phi_array.at(i).at(j);
+      Theta0_array_flat.at(j*n_x + i) = Theta0_array.at(i).at(j);
+      Theta1_array_flat.at(j*n_x + i) = Theta1_array.at(i).at(j);
+      // for(int k=0; k<Constants.n_ell_theta_tc; k++){
+      //   Theta_array_flat[k][j*n_x + i] = Theta_array[k][i][j];
+      // }
     }
   }
 
 
-  printf("HELLO!\n");
-  printf("%lu\n", delta_cdm_array_flat.size());
+  // printf("%lu\n", Theta_array_flat[1].size());
   printf("%lu\n%lu\n", x_array_full.size(), k_array.size());
-  Theta_spline = std::vector<Spline2D>(Constants.n_ell_theta);
+  // Theta_spline = std::vector<Spline2D>(Constants.n_ell_theta);
   delta_cdm_spline.create(x_array_full, k_array, delta_cdm_array_flat, "delta_cdm_spline");
   delta_b_spline.create(x_array_full, k_array, delta_b_array_flat, "delta_b_spline");
   v_cdm_spline.create(x_array_full, k_array, v_cdm_array_flat, "v_cdm_spline");
   v_b_spline.create(x_array_full, k_array, v_b_array_flat, "v_b_spline");
   Phi_spline.create(x_array_full, k_array, Phi_array_flat, "Phi_spline");
-  for(int k=0; k<Constants.n_ell_theta_tc; k++){
-    Theta_spline[k].create(x_array_full, k_array, Theta_array_flat[k], "Theta" + std::to_string(k));
+  // for(int k=0; k<Constants.n_ell_theta_tc; k++){
+  //   Theta_spline[k].create(x_array_full, k_array, Theta_array_flat[k], "Theta" + std::to_string(k));
+  // }
+  // Theta0_spline.create(x_array_full, k_array, Theta_array_flat[0], "Theta0_spline");
+  // Theta1_spline.create(x_array_full, k_array, Theta_array_flat[1], "Theta1_spline");
+  Theta0_spline.create(x_array_full, k_array, Theta0_array_flat, "Theta0_spline");
+  Theta1_spline.create(x_array_full, k_array, Theta1_array_flat, "Theta1_spline");
+  // for(int i=0; i<n_x; i++){
+  //   double x = x_array_full.at(i);
+  //   double k = k_array[0];
+  //   // printf("%e %e %e\n", x, k, Theta_array_flat[1][5*n_x + i]);
+  //   // printf("%e %e %e\n", x, k, Theta1_spline(x, k));
+  //   // printf("%e %e %e\n", x, k, Theta_spline[1](x, k));
+  // }
+
+
+  printf("mello\n");
+  for(int j=0; j<n_k; j++){
+    for(int i=0; i<n_x; i++){
+      double x = x_array_full.at(i);
+      double k = k_array.at(j);
+      double t_a = Theta1_array.at(i).at(j);
+      double t_s = Theta1_spline(x,k);
+      if(abs((t_a - t_s)/t_a) > 1e-6)
+        printf("%e %e %e %e\n", x, k*Constants.Mpc, t_a, t_s);
+    }
   }
+
+
 }
 
 //====================================================
@@ -529,6 +561,7 @@ int Perturbations::rhs_tight_coupling_ode(double x, double k, const double *y, d
   dThetadx[1] = 1.0/3.0*(q - dv_bdx);
 
   // if(x < -15.99)
+  // printf("%f %e %e\n", x, k, dThetadx[1]);
   // printf("%e %e %e %e %e %e\n", dPhidx, ddelta_cdmdx, dv_cdmdx, ddelta_cdmdx, dThetadx[0], dThetadx[1]);
 
   // printf("%e %e %e %e %e\n", x, k, Psi, Hp, Phi);
@@ -645,7 +678,13 @@ double Perturbations::get_Source_E(const double x, const double k) const{
   return SE_spline(x,k);
 }
 double Perturbations::get_Theta(const double x, const double k, const int ell) const{
-  return Theta_spline[ell](x,k);
+  if(ell == 0)
+    return Theta0_spline(x,k);
+  else if(ell == 1)
+    return Theta1_spline(x,k);
+  else
+    return 0;
+  // return Theta_spline[ell](x,k);
 }
 double Perturbations::get_Theta_p(const double x, const double k, const int ell) const{
   return Theta_p_spline[ell](x,k);
@@ -720,6 +759,11 @@ void Perturbations::output(const double k, const std::string filename) const{
   auto x_array = Utils::linspace(x_start, 0, npts);
   auto print_data = [&] (const double x) {
     double arg = k * Constants.c * (cosmo->eta_of_x(0.0) - cosmo->eta_of_x(x));
+    // printf("yo\n");
+
+    // printf("0: %f %e\n", x, get_Theta(x,k,0));
+    // printf("1: %f %e\n", x, get_Theta(x,k,1));
+
     fp << std::setprecision(10);
     fp << x                  << " ";
     fp << get_delta_cdm(x,k) << " ";
@@ -727,7 +771,7 @@ void Perturbations::output(const double k, const std::string filename) const{
     fp << get_v_cdm(x,k)     << " ";
     fp << get_v_b(x,k)       << " ";
     fp << get_Theta(x,k,0)   << " ";
-    // fp << get_Theta(x,k,1)   << " ";
+    fp << get_Theta(x,k,1)   << " ";
     // fp << get_Theta(x,k,2)   << " ";
     // fp << get_Phi(x,k)       << " ";
     // fp << get_Psi(x,k)       << " ";

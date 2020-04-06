@@ -21,12 +21,12 @@ class Perturbations{
     RecombinationHistory *rec  = nullptr;
    
     // The scales we integrate over
-    const int n_k        = 10;
+    const int n_k        = 5;
     const double k_min   = Constants.k_min;
     const double k_max   = Constants.k_max;
     
     // Start and end of the time-integration
-    const int n_x        = 5000;
+    const int n_x        = 500;
     const double x_start = Constants.x_start;
     const double x_end   = 0;
 
@@ -47,6 +47,8 @@ class Perturbations{
     Spline2D SE_spline{"SE_spline"};
     
     // Splines of mulipole quantities
+    Spline2D Theta0_spline;
+    Spline2D Theta1_spline;
     std::vector<Spline2D> Theta_spline;
     std::vector<Spline2D> Theta_p_spline;
     std::vector<Spline2D> Nu_spline;

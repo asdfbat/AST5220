@@ -73,3 +73,6 @@ plotm1:
 
 run:
 	./cmb
+
+valgrind:
+	valgrind --leak-check=yes ./cmb
