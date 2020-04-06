@@ -49,9 +49,6 @@ class Perturbations{
     // Splines of mulipole quantities
     Spline2D Theta0_spline;
     Spline2D Theta1_spline;
-    std::vector<Spline2D> Theta_spline;
-    std::vector<Spline2D> Theta_p_spline;
-    std::vector<Spline2D> Nu_spline;
     
     //==========================================================
     // [1] Tight coupling ODE system
