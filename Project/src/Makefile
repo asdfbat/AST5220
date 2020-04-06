@@ -13,6 +13,8 @@ LIBS = -L$(HOME)/local/lib -lgsl -lgslcblas
 INC += -I/usr/include/python3.7
 LIBS += -lpython3.7m
 
+# OpenMP. Comment out to disable OpenMP.
+CC += -fopenmp
 
 #=======================================================
 # Options

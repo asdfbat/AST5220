@@ -1,3 +1,4 @@
+#include <omp.h>
 #include<string.h>
 #include"Perturbations.h"
 
@@ -49,6 +50,7 @@ void Perturbations::integrate_perturbations(){
   Vector2D v_cdm_array(n_x, Vector(n_k));
   Vector2D v_b_array(n_x, Vector(n_k));
   Vector2D Phi_array(n_x, Vector(n_k));
+  Vector2D Psi_array(n_x, Vector(n_k));
   Vector2D Theta0_array(n_x, Vector(n_k));
   Vector2D Theta1_array(n_x, Vector(n_k));
   Vector2D Theta2_array(n_x, Vector(n_k));
@@ -64,6 +66,7 @@ void Perturbations::integrate_perturbations(){
   Vector v_cdm_array_flat(n_x*n_k);
   Vector v_b_array_flat(n_x*n_k);
   Vector Phi_array_flat(n_x*n_k);
+  Vector Psi_array_flat(n_x*n_k);
   Vector Theta0_array_flat(n_x*n_k);
   Vector Theta1_array_flat(n_x*n_k);
   Vector Theta2_array_flat(n_x*n_k);
@@ -76,6 +79,7 @@ void Perturbations::integrate_perturbations(){
 
 
   // Loop over all wavenumbers
+  #pragma omp parallel for schedule(dynamic, 1)
   for(int ik = 0; ik < n_k; ik++){
     // Progress bar...
     if( (10*ik) / n_k != (10*ik+10) / n_k ) {
@@ -125,15 +129,22 @@ void Perturbations::integrate_perturbations(){
     Vector tc_Theta0    = ode_tc.get_data_by_component(Constants.ind_start_theta_tc);
     Vector tc_Theta1    = ode_tc.get_data_by_component(Constants.ind_start_theta_tc + 1);
 
+    double ck = Constants.c*k;
+
     for(int i=0; i<idx_end_tight+1; i++){
+      double x = x_array_tc.at(i);
+      double Hp = cosmo->Hp_of_x(x);
+      double dtaudx = rec->dtaudx_of_x(x);
+
       delta_cdm_array.at(i).at(ik) = tc_delta_cdm.at(i);
       delta_b_array.at(i).at(ik)   = tc_delta_b.at(i);
       v_cdm_array.at(i).at(ik)     = tc_v_cdm.at(i);
       v_b_array.at(i).at(ik)       = tc_v_b.at(i);
       Phi_array.at(i).at(ik)       = tc_Phi.at(i);
+      Psi_array.at(i).at(ik)       = -tc_Phi.at(i);
       Theta0_array.at(i).at(ik)    = tc_Theta0.at(i);
       Theta1_array.at(i).at(ik)    = tc_Theta1.at(i);
-      Theta2_array.at(i).at(ik)    = -4.0*Constants.c*k/(9.0*cosmo->Hp_of_x(x_array_tc.at(i))*rec->dtaudx_of_x(x_array_tc.at(i)))*tc_Theta1.at(i);
+      Theta2_array.at(i).at(ik)    = -4.0*ck/(9.0*Hp*dtaudx)*tc_Theta1.at(i);
     }
 
     //===================================================================
@@ -158,7 +169,6 @@ void Perturbations::integrate_perturbations(){
     // ...
     // ...
     double x = x_array_full[idx_end_tight];
-    double ck = Constants.c*k;
     double Hp = cosmo->Hp_of_x(x);
     double dtaudx = rec->dtaudx_of_x(x);
 
@@ -211,6 +221,7 @@ void Perturbations::integrate_perturbations(){
       v_cdm_array.at(i).at(ik)     = nontc_v_cdm.at(i-idx_end_tight);
       v_b_array.at(i).at(ik)       = nontc_v_b.at(i-idx_end_tight);
       Phi_array.at(i).at(ik)       = nontc_Phi.at(i-idx_end_tight);
+      Psi_array.at(i).at(ik)       = -nontc_Phi.at(i-idx_end_tight);
       Theta0_array.at(i).at(ik)    = nontc_Theta0.at(i-idx_end_tight);
       Theta1_array.at(i).at(ik)    = nontc_Theta1.at(i-idx_end_tight);
       Theta2_array.at(i).at(ik)    = nontc_Theta2.at(i-idx_end_tight);
@@ -259,6 +270,7 @@ void Perturbations::integrate_perturbations(){
       v_cdm_array_flat.at(j*n_x + i) = v_cdm_array.at(i).at(j);
       v_b_array_flat.at(j*n_x + i) = v_b_array.at(i).at(j);
       Phi_array_flat.at(j*n_x + i) = Phi_array.at(i).at(j);
+      Psi_array_flat.at(j*n_x + i) = Psi_array.at(i).at(j);
       Theta0_array_flat.at(j*n_x + i) = Theta0_array.at(i).at(j);
       Theta1_array_flat.at(j*n_x + i) = Theta1_array.at(i).at(j);
       Theta2_array_flat.at(j*n_x + i) = Theta2_array.at(i).at(j);
@@ -276,6 +288,8 @@ void Perturbations::integrate_perturbations(){
   v_cdm_spline.create(x_array_full, log_k_array, v_cdm_array_flat, "v_cdm_spline");
   v_b_spline.create(x_array_full, log_k_array, v_b_array_flat, "v_b_spline");
   Phi_spline.create(x_array_full, log_k_array, Phi_array_flat, "Phi_spline");
+  Psi_spline.create(x_array_full, log_k_array, Psi_array_flat, "Psi_spline");
+  Pi_spline.create(x_array_full, log_k_array, Theta2_array_flat, "Psi_spline");
   Theta0_spline.create(x_array_full, log_k_array, Theta0_array_flat, "Theta0_spline");
   Theta1_spline.create(x_array_full, log_k_array, Theta1_array_flat, "Theta1_spline");
   Theta2_spline.create(x_array_full, log_k_array, Theta2_array_flat, "Theta2_spline");
@@ -806,8 +820,8 @@ void Perturbations::output(const double k, const std::string filename) const{
     fp << get_Theta(x,k,1)   << " ";
     fp << get_Theta(x,k,2)   << " ";
     fp << get_Phi(x,k)       << " ";
-    // fp << get_Psi(x,k)       << " ";
-    // fp << get_Pi(x,k)        << " ";
+    fp << get_Psi(x,k)       << " ";
+    fp << get_Pi(x,k)        << " ";
     // fp << get_Source_T(x,k)  << " ";
     // fp << get_Source_T(x,k) * Utils::j_ell(5,   arg)           << " ";
     // fp << get_Source_T(x,k) * Utils::j_ell(50,  arg)           << " ";
