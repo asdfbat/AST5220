@@ -23,7 +23,7 @@ void Perturbations::solve(){
   integrate_perturbations();
 
   // Compute source functions and spline the result
-  // compute_source_functions();
+  compute_source_functions();
 }
 
 //====================================================
@@ -54,7 +54,15 @@ void Perturbations::integrate_perturbations(){
   Vector2D Theta0_array(n_x, Vector(n_k));
   Vector2D Theta1_array(n_x, Vector(n_k));
   Vector2D Theta2_array(n_x, Vector(n_k));
-  // Vector2D Theta3_array(n_x, Vector(n_k));
+  Vector2D Theta3_array(n_x, Vector(n_k));
+
+  Vector2D dv_bdx_array(n_x, Vector(n_k));
+  Vector2D dPhidx_array(n_x, Vector(n_k));
+  Vector2D dPsidx_array(n_x, Vector(n_k));
+  Vector2D dTheta0dx_array(n_x, Vector(n_k));
+  Vector2D dTheta1dx_array(n_x, Vector(n_k));
+  Vector2D dTheta2dx_array(n_x, Vector(n_k));
+  Vector2D dTheta3dx_array(n_x, Vector(n_k));
   // Vector2D Theta4_array(n_x, Vector(n_k));
   // Vector2D Theta5_array(n_x, Vector(n_k));
   // Vector2D Theta6_array(n_x, Vector(n_k));
@@ -70,7 +78,15 @@ void Perturbations::integrate_perturbations(){
   Vector Theta0_array_flat(n_x*n_k);
   Vector Theta1_array_flat(n_x*n_k);
   Vector Theta2_array_flat(n_x*n_k);
-  // Vector Theta3_array_flat(n_x*n_k);
+  Vector Theta3_array_flat(n_x*n_k);
+
+  Vector dv_bdx_array_flat(n_x*n_k);
+  Vector dPhidx_array_flat(n_x*n_k);
+  Vector dPsidx_array_flat(n_x*n_k);
+  Vector dTheta0dx_array_flat(n_x*n_k);
+  Vector dTheta1dx_array_flat(n_x*n_k);
+  Vector dTheta2dx_array_flat(n_x*n_k);
+  Vector dTheta3dx_array_flat(n_x*n_k);
   // Vector Theta4_array_flat(n_x*n_k);
   // Vector Theta5_array_flat(n_x*n_k);
   // Vector Theta6_array_flat(n_x*n_k);
@@ -129,6 +145,11 @@ void Perturbations::integrate_perturbations(){
     Vector tc_Theta0    = ode_tc.get_data_by_component(Constants.ind_start_theta_tc);
     Vector tc_Theta1    = ode_tc.get_data_by_component(Constants.ind_start_theta_tc + 1);
 
+    Vector dtc_v_bdx       = ode_tc.get_derivative_data_by_component(Constants.ind_vb_tc);
+    Vector dtc_Phidx       = ode_tc.get_derivative_data_by_component(Constants.ind_Phi_tc);
+    Vector dtc_Theta0dx    = ode_tc.get_derivative_data_by_component(Constants.ind_start_theta_tc);
+    Vector dtc_Theta1dx    = ode_tc.get_derivative_data_by_component(Constants.ind_start_theta_tc + 1);
+
     double ck = Constants.c*k;
 
     for(int i=0; i<idx_end_tight+1; i++){
@@ -145,6 +166,14 @@ void Perturbations::integrate_perturbations(){
       Theta0_array.at(i).at(ik)    = tc_Theta0.at(i);
       Theta1_array.at(i).at(ik)    = tc_Theta1.at(i);
       Theta2_array.at(i).at(ik)    = -4.0*ck/(9.0*Hp*dtaudx)*tc_Theta1.at(i);
+
+      dv_bdx_array.at(i).at(ik)       = dtc_v_bdx.at(i);
+      dPhidx_array.at(i).at(ik)       = dtc_Phidx.at(i);
+      dPsidx_array.at(i).at(ik)       = -dtc_Phidx.at(i);
+      dTheta0dx_array.at(i).at(ik)    = dtc_Theta0dx.at(i);
+      dTheta1dx_array.at(i).at(ik)    = dtc_Theta1dx.at(i);
+      // dTheta2dx_array.at(i).at(ik)    = -4.0*ck/(9.0*Hp*dtaudx)*tc_Theta1.at(i);
+
     }
 
     //===================================================================
@@ -207,7 +236,12 @@ void Perturbations::integrate_perturbations(){
     Vector nontc_Theta0    = ode_nontc.get_data_by_component(Constants.ind_start_theta);
     Vector nontc_Theta1    = ode_nontc.get_data_by_component(Constants.ind_start_theta + 1);
     Vector nontc_Theta2    = ode_nontc.get_data_by_component(Constants.ind_start_theta + 2);
-    // Vector nontc_Theta3    = ode_nontc.get_data_by_component(Constants.ind_start_theta + 3);
+    Vector nontc_Theta3    = ode_nontc.get_data_by_component(Constants.ind_start_theta + 3);
+
+    Vector nontc_dv_bdx       = ode_nontc.get_derivative_data_by_component(Constants.ind_vb);
+    Vector nontc_dPhidx       = ode_nontc.get_derivative_data_by_component(Constants.ind_Phi);
+    Vector nontc_dTheta0dx    = ode_nontc.get_derivative_data_by_component(Constants.ind_start_theta);
+    Vector nontc_dTheta1dx    = ode_nontc.get_derivative_data_by_component(Constants.ind_start_theta + 1);
     // Vector nontc_Theta4    = ode_nontc.get_data_by_component(Constants.ind_start_theta + 4);
     // Vector nontc_Theta5    = ode_nontc.get_data_by_component(Constants.ind_start_theta + 5);
     // Vector nontc_Theta6    = ode_nontc.get_data_by_component(Constants.ind_start_theta + 6);
@@ -225,7 +259,14 @@ void Perturbations::integrate_perturbations(){
       Theta0_array.at(i).at(ik)    = nontc_Theta0.at(i-idx_end_tight);
       Theta1_array.at(i).at(ik)    = nontc_Theta1.at(i-idx_end_tight);
       Theta2_array.at(i).at(ik)    = nontc_Theta2.at(i-idx_end_tight);
-      // Theta3_array.at(i).at(ik)    = nontc_Theta3.at(i-idx_end_tight-1);
+      Theta3_array.at(i).at(ik)    = nontc_Theta3.at(i-idx_end_tight-1);
+
+      dv_bdx_array.at(i).at(ik)       = nontc_dv_bdx.at(i-idx_end_tight);
+      dPhidx_array.at(i).at(ik)       = nontc_dPhidx.at(i-idx_end_tight);
+      dPsidx_array.at(i).at(ik)       = -nontc_dPhidx.at(i-idx_end_tight);
+      dTheta0dx_array.at(i).at(ik)    = nontc_dTheta0dx.at(i-idx_end_tight);
+      dTheta1dx_array.at(i).at(ik)    = nontc_dTheta1dx.at(i-idx_end_tight);
+
       // Theta4_array.at(i).at(ik)    = nontc_Theta4.at(i-idx_end_tight-1);
       // Theta5_array.at(i).at(ik)    = nontc_Theta5.at(i-idx_end_tight-1);
       // Theta6_array.at(i).at(ik)    = nontc_Theta6.at(i-idx_end_tight-1);
@@ -274,7 +315,14 @@ void Perturbations::integrate_perturbations(){
       Theta0_array_flat.at(j*n_x + i) = Theta0_array.at(i).at(j);
       Theta1_array_flat.at(j*n_x + i) = Theta1_array.at(i).at(j);
       Theta2_array_flat.at(j*n_x + i) = Theta2_array.at(i).at(j);
-      // Theta3_array_flat.at(j*n_x + i) = Theta3_array.at(i).at(j);
+      Theta3_array_flat.at(j*n_x + i) = Theta3_array.at(i).at(j);
+
+      dv_bdx_array_flat.at(j*n_x + i) = dv_bdx_array.at(i).at(j);
+      dPhidx_array_flat.at(j*n_x + i) = dPhidx_array.at(i).at(j);
+      dPsidx_array_flat.at(j*n_x + i) = dPsidx_array.at(i).at(j);
+      dTheta0dx_array_flat.at(j*n_x + i) = dTheta0dx_array.at(i).at(j);
+      dTheta1dx_array_flat.at(j*n_x + i) = dTheta1dx_array.at(i).at(j);
+
       // Theta4_array_flat.at(j*n_x + i) = Theta4_array.at(i).at(j);
       // Theta5_array_flat.at(j*n_x + i) = Theta5_array.at(i).at(j);
       // Theta6_array_flat.at(j*n_x + i) = Theta6_array.at(i).at(j);
@@ -293,6 +341,15 @@ void Perturbations::integrate_perturbations(){
   Theta0_spline.create(x_array_full, log_k_array, Theta0_array_flat, "Theta0_spline");
   Theta1_spline.create(x_array_full, log_k_array, Theta1_array_flat, "Theta1_spline");
   Theta2_spline.create(x_array_full, log_k_array, Theta2_array_flat, "Theta2_spline");
+  Theta3_spline.create(x_array_full, log_k_array, Theta3_array_flat, "Theta3_spline");
+
+  dv_bdx_spline.create(x_array_full, log_k_array, v_b_array_flat, "v_b_spline");
+  dPhidx_spline.create(x_array_full, log_k_array, Phi_array_flat, "Phi_spline");
+  dPsidx_spline.create(x_array_full, log_k_array, Psi_array_flat, "Psi_spline");
+  dPidx_spline.create(x_array_full, log_k_array, Theta2_array_flat, "Psi_spline");
+  dTheta0dx_spline.create(x_array_full, log_k_array, Theta0_array_flat, "Theta0_spline");
+  dTheta1dx_spline.create(x_array_full, log_k_array, Theta1_array_flat, "Theta1_spline");
+
 }
 
 //====================================================
@@ -468,17 +525,21 @@ void Perturbations::compute_source_functions(){
   //=============================================================================
   // ...
   // ...
-  Vector k_array;
-  Vector x_array;
+  Vector log_k_array = Utils::linspace(log(k_min), log(k_max), n_k);
+  Vector k_array(n_k);
+  for(int i=0; i<n_k; i++)
+    k_array.at(i) = exp(log_k_array.at(i));
+  Vector x_array = Utils::linspace(x_start, x_end, n_x);
 
   // Make storage for the source functions (in 1D array to be able to pass it to the spline)
   Vector ST_array(k_array.size() * x_array.size());
   Vector SE_array(k_array.size() * x_array.size());
 
   // Compute source functions
-  for(auto ix = 0; ix < x_array.size(); ix++){
+  #pragma omp parallel for
+  for(int ix = 0; ix < x_array.size(); ix++){
     const double x = x_array[ix];
-    for(auto ik = 0; ik < k_array.size(); ik++){
+    for(int ik = 0; ik < k_array.size(); ik++){
       const double k = k_array[ik];
 
       // NB: This is the format the data needs to be stored 
@@ -493,9 +554,33 @@ void Perturbations::compute_source_functions(){
       // const double tau      = rec->tau_of_x(x);
       // ...
       // ...
+      const double Hp         = cosmo->Hp_of_x(x);
+      const double dHpdx      = cosmo->dHpdx_of_x(x);
+      const double tau        = rec->tau_of_x(x);
+      const double dtaudx     = rec->dtaudx_of_x(x);
+      const double ddtauddx   = rec->ddtauddx_of_x(x);
+      const double g_tilde    = rec->g_tilde_of_x(x);
+      const double dg_tildedx = rec->dgdx_tilde_of_x(x);
+
+      const double Psi        = get_Psi(x,k);
+      const double dPsidx     = get_dPsidx(x,k);
+      const double Phi        = get_Phi(x,k);
+      const double dPhidx     = get_dPhidx(x,k);
+      const double Pi         = get_Pi(x,k);
+      const double dPidx      = get_dPidx(x,k);
+      const double v_b        = get_v_b(x,k);
+      const double dv_bdx     = get_dv_bdx(x,k);
+      const double Theta0     = get_Theta(x,k,0);
+      const double Theta1     = get_Theta(x,k,1);
+      const double dTheta1dx  = get_dThetadx(x,k,1);
+      const double Theta3     = get_Theta(x,k,3);
+      const double dTheta3dx  = get_dThetadx(x,k,3);
+      
 
       // Temperatur source
-      ST_array[index] = 0.0;
+      ST_array[index] = g_tilde*(Theta0 + Psi + 0.25*Pi) + exp(-tau)*(dPsidx - dPhidx)\
+      - 1.0/k*(dHpdx*g_tilde*v_b + Hp*dg_tildedx*v_b + Hp*g_tilde*dv_bdx)\
+      + 0.75/(k*k)*(0.4*k/Hp*(-dHpdx/Hp*Theta1 + dTheta1dx) + 0.3*(ddtauddx*Pi + dtaudx*dPidx) - 0.6*k/Hp*(-dHpdx/Hp*Theta3 + dTheta3dx));
 
       // Polarization source
       if(Constants.polarization){
@@ -505,10 +590,7 @@ void Perturbations::compute_source_functions(){
   }
 
   // Spline the source functions
-  ST_spline.create (x_array, k_array, ST_array, "Source_Temp_x_k");
-  if(Constants.polarization){
-    SE_spline.create (x_array, k_array, SE_array, "Source_Pol_x_k");
-  }
+  ST_spline.create(x_array, log_k_array, ST_array, "Source_Temp_x_k");
 
   Utils::EndTiming("source");
 }
@@ -705,29 +787,45 @@ double Perturbations::get_v_b(const double x, const double k) const{
   double log_k = log(k);
   return v_b_spline(x,log_k);
 }
+double Perturbations::get_dv_bdx(const double x, const double k) const{
+  double log_k = log(k);
+  // return dv_bdx_spline(x,log_k);
+  return v_b_spline.deriv_x(x,log_k);
+}
 double Perturbations::get_Phi(const double x, const double k) const{
   double log_k = log(k);
   return Phi_spline(x,log_k);
+}
+double Perturbations::get_dPhidx(const double x, const double k) const{
+  double log_k = log(k);
+  // return dPhidx_spline(x,log_k);
+  return Phi_spline.deriv_x(x,log_k);
 }
 double Perturbations::get_Psi(const double x, const double k) const{
   double log_k = log(k);
   return Psi_spline(x,log_k);
 }
+double Perturbations::get_dPsidx(const double x, const double k) const{
+  double log_k = log(k);
+  // return dPsidx_spline(x,log_k);
+  return Psi_spline.deriv_x(x,log_k);
+}
 double Perturbations::get_Pi(const double x, const double k) const{
   double log_k = log(k);
   return Pi_spline(x,log_k);
+}
+double Perturbations::get_dPidx(const double x, const double k) const{
+  double log_k = log(k);
+  // return dPidx_spline(x,log_k);
+  return Pi_spline.deriv_x(x,log_k);
 }
 double Perturbations::get_Source_T(const double x, const double k) const{
   double log_k = log(k);
   return ST_spline(x,log_k);
 }
-double Perturbations::get_Source_E(const double x, const double k) const{
-  double log_k = log(k);
-  return SE_spline(x,log_k);
-}
+
 double Perturbations::get_Theta(const double x, const double k, const int ell) const{
   double log_k = log(k);
-
   switch(ell){
     case 0:
       return Theta0_spline(x,log_k);
@@ -735,11 +833,46 @@ double Perturbations::get_Theta(const double x, const double k, const int ell) c
       return Theta1_spline(x,log_k);
     case 2:
       return Theta2_spline(x,log_k);
+    case 3:
+      return Theta2_spline(x,log_k);
     default:
-      printf("Error: Unknown element of theta, l=%d", ell);
+      printf("Error: Unknown element of theta, l=%d\n", ell);
       return -9999999;
   }
-
+}
+double Perturbations::get_dThetadx(const double x, const double k, const int ell) const{
+  double log_k = log(k);
+  switch(ell){
+    case 0:
+      // return dTheta0dx_spline(x, log_k);
+      return Theta0_spline.deriv_x(x, log_k);
+    case 1:
+      // return dTheta1dx_spline(x, log_k);
+      return Theta1_spline.deriv_x(x, log_k);
+    case 2:
+      return Theta2_spline.deriv_x(x, log_k);
+    case 3:
+      return Theta3_spline.deriv_x(x, log_k);
+    default:
+      printf("Error: Unknown element of theta, l=%d\n", ell);
+      return -9999999;
+  }
+}
+double Perturbations::get_ddThetaddx(const double x, const double k, const int ell) const{
+  double log_k = log(k);
+  switch(ell){
+    case 0:
+      return Theta0_spline.deriv_xx(x, log_k);
+    case 1:
+      return Theta1_spline.deriv_xx(x, log_k);
+    case 2:
+      return Theta2_spline.deriv_xx(x, log_k);
+    case 3:
+      return Theta3_spline.deriv_xx(x, log_k);
+    default:
+      printf("Error: Unknown element of theta, l=%d\n", ell);
+      return -9999999;
+  }
 }
 
 
@@ -822,10 +955,10 @@ void Perturbations::output(const double k, const std::string filename) const{
     fp << get_Phi(x,k)       << " ";
     fp << get_Psi(x,k)       << " ";
     fp << get_Pi(x,k)        << " ";
-    // fp << get_Source_T(x,k)  << " ";
-    // fp << get_Source_T(x,k) * Utils::j_ell(5,   arg)           << " ";
-    // fp << get_Source_T(x,k) * Utils::j_ell(50,  arg)           << " ";
-    // fp << get_Source_T(x,k) * Utils::j_ell(500, arg)           << " ";
+    fp << get_Source_T(x,k)  << " ";
+    fp << get_Source_T(x,k) * Utils::j_ell(5,   arg)           << " ";
+    fp << get_Source_T(x,k) * Utils::j_ell(50,  arg)           << " ";
+    fp << get_Source_T(x,k) * Utils::j_ell(500, arg)           << " ";
     fp << "\n";
   };
   std::for_each(x_array.begin(), x_array.end(), print_data);
