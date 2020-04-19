@@ -834,7 +834,7 @@ double Perturbations::get_Theta(const double x, const double k, const int ell) c
     case 2:
       return Theta2_spline(x,log_k);
     case 3:
-      return Theta2_spline(x,log_k);
+      return Theta3_spline(x,log_k);
     default:
       printf("Error: Unknown element of theta, l=%d\n", ell);
       return -9999999;
@@ -944,21 +944,22 @@ void Perturbations::output(const double k, const std::string filename) const{
     double arg = k * Constants.c * (cosmo->eta_of_x(0.0) - cosmo->eta_of_x(x));
 
     fp << std::setprecision(10);
-    fp << x                  << " ";
-    fp << get_delta_cdm(x,k) << " ";
-    fp << get_delta_b(x,k)   << " ";
-    fp << get_v_cdm(x,k)     << " ";
-    fp << get_v_b(x,k)       << " ";
-    fp << get_Theta(x,k,0)   << " ";
-    fp << get_Theta(x,k,1)   << " ";
-    fp << get_Theta(x,k,2)   << " ";
-    fp << get_Phi(x,k)       << " ";
-    fp << get_Psi(x,k)       << " ";
-    fp << get_Pi(x,k)        << " ";
-    fp << get_Source_T(x,k)  << " ";
-    fp << get_Source_T(x,k) * Utils::j_ell(5,   arg)           << " ";
-    fp << get_Source_T(x,k) * Utils::j_ell(50,  arg)           << " ";
-    fp << get_Source_T(x,k) * Utils::j_ell(500, arg)           << " ";
+    fp << x                  << " ";  // 0
+    fp << get_delta_cdm(x,k) << " ";  // 1
+    fp << get_delta_b(x,k)   << " ";  // 2
+    fp << get_v_cdm(x,k)     << " ";  // 3
+    fp << get_v_b(x,k)       << " ";  // 4
+    fp << get_Theta(x,k,0)   << " ";  // 5
+    fp << get_Theta(x,k,1)   << " ";  // 6
+    fp << get_Theta(x,k,2)   << " ";  // 7
+    fp << get_Theta(x,k,3)   << " ";  // 8
+    fp << get_Phi(x,k)       << " ";  // 9
+    fp << get_Psi(x,k)       << " ";  // 10
+    fp << get_Pi(x,k)        << " ";  // 11
+    fp << get_Source_T(x,k)  << " ";  // 12
+    fp << get_Source_T(x,k) * Utils::j_ell(5,   arg)           << " ";  // 13
+    fp << get_Source_T(x,k) * Utils::j_ell(50,  arg)           << " ";  // 14
+    fp << get_Source_T(x,k) * Utils::j_ell(500, arg)           << " ";  // 15
     fp << "\n";
   };
   std::for_each(x_array.begin(), x_array.end(), print_data);
