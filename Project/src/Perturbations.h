@@ -78,12 +78,6 @@ class Perturbations{
     // [2] The full ODE system 
     //==========================================================
     
-    // Set initial condition after tight coupling
-    Vector set_ic_after_tight_coupling(
-        const Vector &y_tight_coupling, 
-        const double x, 
-        const double k) const;
-
     // Right hand side of the ODE in the full regime
     int rhs_full_ode(double x, double k, const double *y, double *dydx);
     
