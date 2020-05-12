@@ -21,7 +21,7 @@ void PowerSpectrum::solve(){
   //=========================================================================
   // TODO: Choose the range of k's and the resolution to compute Theta_ell(k)
   //=========================================================================
-  Vector k_array;
+  Vector k_array = Utils::linspace(log(k_min), log(k_max), n_k);
   Vector log_k_array = log(k_array);
 
   //=========================================================================
@@ -34,14 +34,14 @@ void PowerSpectrum::solve(){
   // TODO: Line of sight integration to get Theta_ell(k)
   // Implement line_of_sight_integration
   //=========================================================================
-  line_of_sight_integration(k_array);
+  //* line_of_sight_integration(k_array);
 
   //=========================================================================
   // TODO: Integration to get Cell by solving dCell^f/dlogk = Delta(k) * f_ell(k)^2
   // Implement solve_for_cell
   //=========================================================================
-  auto cell_TT = solve_for_cell(log_k_array, thetaT_ell_of_k_spline, thetaT_ell_of_k_spline);
-  cell_TT_spline.create(ells, cell_TT, "Cell_TT_of_ell");
+  // *auto cell_TT = solve_for_cell(log_k_array, thetaT_ell_of_k_spline, thetaT_ell_of_k_spline);
+  // *cell_TT_spline.create(ells, cell_TT, "Cell_TT_of_ell");
   
   //=========================================================================
   // TODO: Do the same for polarization...
@@ -72,12 +72,16 @@ void PowerSpectrum::generate_bessel_function_splines(){
   for(size_t i = 0; i < ells.size(); i++){
     const int ell = ells[i];
 
-    // ...
-    // ...
-    // ...
-    // ...
+    // Vector log_z_array = Utils::linspace(0, log(1e4), 1000);
+    // Vector z_array = exp(log_z_array);
+    Vector z_array = Utils::linspace(0, 1e4, 10001);
+    Vector j_ell_array(10001);
+    for(int j=0; j<10001; j++){
+      j_ell_array[j] = Utils::j_ell(ell, z_array[j]);
+    }
 
-    // Make the j_ell_splines[i] spline
+    j_ell_splines[i] = Spline(z_array, j_ell_array, "j_ell_spline");
+
   }
 
   Utils::EndTiming("besselspline");
@@ -106,7 +110,30 @@ Vector2D PowerSpectrum::line_of_sight_integration_single(
     // ...
     // ...
     // ...
+    double k = k_array[ik];
+    Vector x_array = Utils::linspace(-16, 0, 1001);
+    Vector Theta_ell_ini = {0.0};
 
+
+    for(int iell = 0; iell < ells.size(); iell++){
+      int ell = ells[iell];
+      Spline j_ell_spline = j_ell_splines[ell];
+
+      ODEFunction dTheta_elldx = [&](double x, const double *Theta, double *dThetadx){
+        double Delta_eta = cosmo->eta_of_x(0) - cosmo->eta_of_x(x);
+        double S = pert->get_Source_T(x,k);
+        double j = j_ell_spline(k*Delta_eta);
+
+        dThetadx[0] = S*j;
+        return GSL_SUCCESS;
+      };
+
+    ODESolver ode;
+    ode.solve(dTheta_elldx, x_array, Theta_ell_ini);
+
+    result[ell][ik] = ode.get_data_by_component(0)[1001];
+
+    }
     // Store the result for Source_ell(k) in results[ell][ik]
   }
 
@@ -143,17 +170,6 @@ void PowerSpectrum::line_of_sight_integration(Vector & k_array){
   // ...
   // ...
 
-  //============================================================================
-  // TODO: Solve for ThetaE_ell(k) and spline
-  //============================================================================
-  if(Constants.polarization){
-
-    // ...
-    // ...
-    // ...
-    // ...
-
-  }
 }
 
 //====================================================

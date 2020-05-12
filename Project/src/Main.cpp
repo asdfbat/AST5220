@@ -68,14 +68,15 @@ int main(int argc, char **argv){
   pert.output(0.1/Constants.Mpc, "../data/perturbations_k0.1.txt");
   pert.output(0.01/Constants.Mpc, "../data/perturbations_k0.01.txt");
   pert.output(0.001/Constants.Mpc, "../data/perturbations_k0.001.txt");  
-  return 0;
+  // return 0;
   
   //=========================================================================
   // Module IV
   //=========================================================================
 
   PowerSpectrum power(&cosmo, &rec, &pert);
-  power.output("cells.txt");
+  power.solve();
+  // power.output("cells.txt");
   
   // Remove when module is completed
   return 0;
