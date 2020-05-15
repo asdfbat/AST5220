@@ -407,11 +407,13 @@ void Perturbations::compute_source_functions(){
       // ...
       const double Hp         = cosmo->Hp_of_x(x);
       const double dHpdx      = cosmo->dHpdx_of_x(x);
+      const double ddHpddx    = cosmo->ddHpddx_of_x(x);
       const double tau        = rec->tau_of_x(x);
       const double dtaudx     = rec->dtaudx_of_x(x);
       const double ddtauddx   = rec->ddtauddx_of_x(x);
       const double g_tilde    = rec->g_tilde_of_x(x);
       const double dg_tildedx = rec->dgdx_tilde_of_x(x);
+      const double ddg_tildeddx = rec->ddgddx_tilde_of_x(x);
 
       const double Psi        = get_Psi(x,k);
       const double dPsidx     = get_dPsidx(x,k);
@@ -419,6 +421,7 @@ void Perturbations::compute_source_functions(){
       const double dPhidx     = get_dPhidx(x,k);
       const double Pi         = get_Pi(x,k);
       const double dPidx      = get_dPidx(x,k);
+      const double ddPiddx    = get_ddPiddx(x,k);
       const double v_b        = get_v_b(x,k);
       const double dv_bdx     = get_dv_bdx(x,k);
       const double Theta0     = get_Theta(x,k,0);
@@ -426,12 +429,14 @@ void Perturbations::compute_source_functions(){
       const double dTheta1dx  = get_dThetadx(x,k,1);
       const double Theta3     = get_Theta(x,k,3);
       const double dTheta3dx  = get_dThetadx(x,k,3);
+
+      const double ck = Constants.c*k;
       
 
       // Temperatur source
       ST_array[index] = g_tilde*(Theta0 + Psi + 0.25*Pi) + exp(-tau)*(dPsidx - dPhidx)\
-      - 1.0/k*(dHpdx*g_tilde*v_b + Hp*dg_tildedx*v_b + Hp*g_tilde*dv_bdx)\
-      + 0.75/(k*k)*(0.4*k/Hp*(-dHpdx/Hp*Theta1 + dTheta1dx) + 0.3*(ddtauddx*Pi + dtaudx*dPidx) - 0.6*k/Hp*(-dHpdx/Hp*Theta3 + dTheta3dx));
+      - 1.0/ck*(dHpdx*g_tilde*v_b + Hp*dg_tildedx*v_b + Hp*g_tilde*dv_bdx)\
+      + 0.75/(ck*ck) * (dHpdx*dHpdx + Hp*ddHpddx)*g_tilde*Pi + 3.0*Hp*dHpdx*(dg_tildedx*Pi + g_tilde*dPidx) + Hp*Hp*(ddg_tildeddx*Pi + 2.0*dg_tildedx*dPidx + g_tilde*ddPiddx);
 
       // Polarization source
       if(Constants.polarization){
@@ -672,6 +677,10 @@ double Perturbations::get_dPidx(const double x, const double k) const{
   double log_k = log(k);
   // return dPidx_spline(x,log_k);
   return Pi_spline.deriv_x(x,log_k);
+}
+double Perturbations::get_ddPiddx(const double x, const double k) const{
+  double log_k = log(k);
+  return Pi_spline.deriv_xx(x,log_k);
 }
 double Perturbations::get_Source_T(const double x, const double k) const{
   double log_k = log(k);
