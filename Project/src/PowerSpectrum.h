@@ -26,9 +26,10 @@ class PowerSpectrum {
     double A_s        = 2e-9;
     double n_s        = 0.96;
     double kpivot_mpc = 0.05;
+    double kpivot     = kpivot_mpc/Constants.Mpc;
 
     // The k-values we compute Theta_ell(k) etc. for
-    const int n_k      = 100;
+    const int n_k      = 500;
     const double k_min = Constants.k_min;
     const double k_max = Constants.k_max;
     
@@ -111,9 +112,13 @@ class PowerSpectrum {
     double get_cell_TT(const double ell) const;
     double get_cell_TE(const double ell) const;
     double get_cell_EE(const double ell) const;
+    double get_P(const double x, const double k) const;
+    double get_Theta_ell_k(const double iell, const double k) const;
 
     // Output Cells in units of l(l+1)/2pi (muK)^2
-    void output(std::string filename) const;
+    void output_Cell(std::string filename) const;
+    void output_P(std::string filename) const;
+    void output_Theta(std::string filename, const int iell) const;
 };
 
 #endif

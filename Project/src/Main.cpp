@@ -13,8 +13,8 @@ int main(int argc, char **argv){
 
   // Background parameters
   double h           = 0.7;
-  double OmegaB      = 0.046;
-  double OmegaCDM    = 0.224;
+  double OmegaB      = 0.05; //0.046;
+  double OmegaCDM    = 0.45; //0.224;
   double Neff        = 3.046;
   double TCMB        = 2.725;
 
@@ -67,7 +67,7 @@ int main(int argc, char **argv){
   pert.output(1.0/Constants.Mpc, "../data/perturbations_k1.0.txt");
   pert.output(0.1/Constants.Mpc, "../data/perturbations_k0.1.txt");
   pert.output(0.01/Constants.Mpc, "../data/perturbations_k0.01.txt");
-  pert.output(0.001/Constants.Mpc, "../data/perturbations_k0.001.txt");  
+  pert.output(0.001/Constants.Mpc, "../data/perturbations_k0.001.txt");
   // return 0;
   
   //=========================================================================
@@ -76,7 +76,12 @@ int main(int argc, char **argv){
 
   PowerSpectrum power(&cosmo, &rec, &pert);
   power.solve();
-  power.output("cells.txt");
+  power.output_Cell("../data/cells.txt");
+  power.output_P("../data/P.txt");
+  power.output_Theta("../data/Theta_l=2.txt", 0);
+  power.output_Theta("../data/Theta_l=20.txt", 10);
+  power.output_Theta("../data/Theta_l=120.txt", 20);
+  power.output_Theta("../data/Theta_l=400.txt", 30);
   
   // Remove when module is completed
   return 0;

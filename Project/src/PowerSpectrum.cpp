@@ -40,8 +40,8 @@ void PowerSpectrum::solve(){
   // TODO: Integration to get Cell by solving dCell^f/dlogk = Delta(k) * f_ell(k)^2
   // Implement solve_for_cell
   //=========================================================================
-  // *auto cell_TT = solve_for_cell(log_k_array, thetaT_ell_of_k_spline, thetaT_ell_of_k_spline);
-  // *cell_TT_spline.create(ells, cell_TT, "Cell_TT_of_ell");
+  auto cell_TT = solve_for_cell(log_k_array, thetaT_ell_of_k_spline, thetaT_ell_of_k_spline);
+  cell_TT_spline.create(ells, cell_TT, "Cell_TT_of_ell");
   
   //=========================================================================
   // TODO: Do the same for polarization...
@@ -145,7 +145,6 @@ Vector2D PowerSpectrum::line_of_sight_integration_single(
 //====================================================
 void PowerSpectrum::line_of_sight_integration(Vector & k_array){
   const int n_k        = k_array.size();
-  const int n          = 100;
   const int nells      = ells.size();
   
   // Make storage for the splines we are to create
@@ -173,6 +172,8 @@ void PowerSpectrum::line_of_sight_integration(Vector & k_array){
     thetaT_ell_of_k_spline[iell] = thetaT_spline;
   }
 
+
+
 }
 
 //====================================================
@@ -189,13 +190,26 @@ Vector PowerSpectrum::solve_for_cell(
   // TODO: Integrate Cell = Int 4 * pi * P(k) f_ell g_ell dk/k
   // or equivalently solve the ODE system dCell/dlogk = 4 * pi * P(k) * f_ell * g_ell
   //============================================================================
+  Vector result(nells);
 
-  // ...
-  // ...
-  // ...
-  // ...
+  for(int iell=0; iell<nells; iell++){
+    ODEFunction dCelldlogk_func = [&](double logk, const double *Cell, double *dCelldlogk){
+      const double k = exp(logk);
+      const double f_ell = f_ell_spline[iell](k);
+      const double g_ell = g_ell_spline[iell](k);
+      dCelldlogk[0] = 4*M_PI*A_s*pow(k/kpivot, n_s-1)*f_ell*g_ell;
 
-  Vector result;
+      return GSL_SUCCESS;
+    };
+
+    Vector logk_array = Utils::linspace(log(k_min), log(k_max), n_k);
+    Vector Cell_ic = {0.0};
+
+    ODESolver ode;
+    ode.solve(dCelldlogk_func, logk_array, Cell_ic);
+
+    result[iell] = ode.get_data_by_component(0)[n_k-1];
+  }
 
   return result;
 }
@@ -238,13 +252,48 @@ double PowerSpectrum::get_cell_TE(const double ell) const{
 double PowerSpectrum::get_cell_EE(const double ell) const{
   return cell_EE_spline(ell);
 }
+double PowerSpectrum::get_P(const double x, const double k) const{
+  const double a = exp(x);
+  const double ck = Constants.c*k;
+  const double H0 = cosmo->get_H0();
+  const double OmegaM = cosmo->get_OmegaB(x) + cosmo->get_OmegaCDM(x);
+  const double Delta_m = ck*ck*pert->get_Psi(x, k)/(1.5*OmegaM/a*H0*H0);
+  const double P_primordial = 2*M_PI*M_PI/(k*k*k)*A_s*pow(k/kpivot, n_s-1);
+  return Delta_m*Delta_m*P_primordial;
+}
+double PowerSpectrum::get_Theta_ell_k(const double iell, const double k) const{
+  return thetaT_ell_of_k_spline[iell](k);
+}
 
 //====================================================
 // Output the cells to file
 //====================================================
 
-void PowerSpectrum::output(std::string filename) const{
-  // Output in standard units of muK^2
+void PowerSpectrum::output_P(std::string filename) const{
+  std::ofstream fp(filename.c_str());
+  Vector logk_array = Utils::linspace(log(k_min), log(k_max), n_k);
+  auto print_data = [&] (const double logk) {
+    const double k = exp(logk);
+    fp << k << " ";
+    fp << get_P(0, k);
+    fp << "\n";
+  };
+  std::for_each(logk_array.begin(), logk_array.end(), print_data);
+}
+
+void PowerSpectrum::output_Theta(std::string filename, const int iell) const{
+  std::ofstream fp(filename.c_str());
+  Vector logk_array = Utils::linspace(log(k_min), log(k_max), n_k);
+  auto print_data = [&] (const double logk) {
+    const double k = exp(logk);
+    fp << k << " ";
+    fp << get_Theta_ell_k(iell, k);
+    fp << "\n";
+  };
+  std::for_each(logk_array.begin(), logk_array.end(), print_data);
+}
+
+void PowerSpectrum::output_Cell(std::string filename) const{
   std::ofstream fp(filename.c_str());
   const int ellmax = int(ells[ells.size()-1]);
   auto ellvalues = Utils::linspace(2, ellmax, ellmax-1);

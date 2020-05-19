@@ -21,12 +21,12 @@ class Perturbations{
     RecombinationHistory *rec  = nullptr;
    
     // The scales we integrate over
-    const int n_k        = 20;
+    const int n_k        = 500;
     const double k_min   = Constants.k_min;
     const double k_max   = Constants.k_max;
     
     // Start and end of the time-integration
-    const int n_x        = 500;
+    const int n_x        = 5000;
     const double x_start = Constants.x_start;
     const double x_end   = 0;
 

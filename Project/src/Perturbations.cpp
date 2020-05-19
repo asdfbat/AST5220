@@ -438,10 +438,7 @@ void Perturbations::compute_source_functions(){
       - 1.0/ck*(dHpdx*g_tilde*v_b + Hp*dg_tildedx*v_b + Hp*g_tilde*dv_bdx)\
       + 0.75/(ck*ck) * (dHpdx*dHpdx + Hp*ddHpddx)*g_tilde*Pi + 3.0*Hp*dHpdx*(dg_tildedx*Pi + g_tilde*dPidx) + Hp*Hp*(ddg_tildeddx*Pi + 2.0*dg_tildedx*dPidx + g_tilde*ddPiddx);
 
-      // Polarization source
-      if(Constants.polarization){
-        SE_array[index] = 0.0;
-      }
+
     }
   }
 
