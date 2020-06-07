@@ -163,7 +163,6 @@ void Perturbations::integrate_perturbations(){
     double Hp = cosmo->Hp_of_x(x);
     double dtaudx = rec->dtaudx_of_x(x);
 
-    // printf("%d\n", Constants.n_ell_tot_full);
     Vector y_nontc_ini(Constants.n_ell_tot_full);
     y_nontc_ini[Constants.ind_vcdm]          = tc_v_cdm[idx_end_tight];
     y_nontc_ini[Constants.ind_vb]            = tc_v_b[idx_end_tight];
@@ -177,13 +176,11 @@ void Perturbations::integrate_perturbations(){
       y_nontc_ini[Constants.ind_start_theta+l] = l/(2*l + 1)*ck/(Hp*dtaudx)*y_nontc_ini[Constants.ind_start_theta+l-1];
     }
 
-    // printf("ASDF -> %lu\n", y_nontc_ini.size());
   
 
     int n_x_nontc = n_x - idx_end_tight;
 
 
-    // printf("---- %d %d %d\n", n_x_nontc, n_x, idx_end_tight);
 
 
     Vector x_array_nontc = Utils::linspace(x_end_tight, x_end, n_x_nontc);
@@ -269,7 +266,7 @@ void Perturbations::integrate_perturbations(){
   v_b_spline.create(x_array_full, log_k_array, v_b_array_flat, "v_b_spline");
   Phi_spline.create(x_array_full, log_k_array, Phi_array_flat, "Phi_spline");
   Psi_spline.create(x_array_full, log_k_array, Psi_array_flat, "Psi_spline");
-  Pi_spline.create(x_array_full, log_k_array, Theta2_array_flat, "Psi_spline");
+  Pi_spline.create(x_array_full, log_k_array, Theta2_array_flat, "Pi_spline");
   Theta0_spline.create(x_array_full, log_k_array, Theta0_array_flat, "Theta0_spline");
   Theta1_spline.create(x_array_full, log_k_array, Theta1_array_flat, "Theta1_spline");
   Theta2_spline.create(x_array_full, log_k_array, Theta2_array_flat, "Theta2_spline");
@@ -434,9 +431,14 @@ void Perturbations::compute_source_functions(){
       
 
       // Temperatur source
-      ST_array[index] = g_tilde*(Theta0 + Psi + 0.25*Pi) + exp(-tau)*(dPsidx - dPhidx)\
-      - 1.0/ck*(dHpdx*g_tilde*v_b + Hp*dg_tildedx*v_b + Hp*g_tilde*dv_bdx)\
-      + 0.75/(ck*ck) * (dHpdx*dHpdx + Hp*ddHpddx)*g_tilde*Pi + 3.0*Hp*dHpdx*(dg_tildedx*Pi + g_tilde*dPidx) + Hp*Hp*(ddg_tildeddx*Pi + 2.0*dg_tildedx*dPidx + g_tilde*ddPiddx);
+      double SW, ISW, Dop, Quad;
+      SW = g_tilde*(Theta0 + Psi + 0.25*Pi);
+      ISW = exp(-tau)*(dPsidx - dPhidx);
+      Dop = 1.0/ck*(dHpdx*g_tilde*v_b + Hp*dg_tildedx*v_b + Hp*g_tilde*dv_bdx);
+      Quad = 0.75/(ck*ck) * (dHpdx*dHpdx + Hp*ddHpddx)*g_tilde*Pi + 3.0*Hp*dHpdx*(dg_tildedx*Pi + g_tilde*dPidx) + Hp*Hp*(ddg_tildeddx*Pi + 2.0*dg_tildedx*dPidx + g_tilde*ddPiddx);
+
+      ST_array[index] = SW + ISW - Dop + Quad;
+      // ST_array[index] = Quad;
 
 
     }

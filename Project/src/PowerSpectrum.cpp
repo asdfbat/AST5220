@@ -72,15 +72,15 @@ void PowerSpectrum::generate_bessel_function_splines(){
   for(size_t i = 0; i < ells.size(); i++){
     const int ell = ells[i];
 
-    // Vector log_z_array = Utils::linspace(0, log(1e4), 1000);
-    // Vector z_array = exp(log_z_array);
-    Vector z_array = Utils::linspace(0, 4e4, 10001);
+    Vector log_z_array = Utils::linspace(log(1e-8), log(4e4), 10001);
+    Vector z_array = exp(log_z_array);
+    // Vector z_array = Utils::linspace(0, 4e4, 100001);
     Vector j_ell_array(10001);
     for(int j=0; j<10001; j++){
       j_ell_array[j] = Utils::j_ell(ell, z_array[j]);
     }
 
-    j_ell_splines[i] = Spline(z_array, j_ell_array, "j_ell_spline");
+    j_ell_splines[i] = Spline(log_z_array, j_ell_array, "j_ell_spline");
 
   }
 
@@ -99,8 +99,26 @@ Vector2D PowerSpectrum::line_of_sight_integration_single(
 
   // Make storage for the results
   Vector2D result = Vector2D(ells.size(), Vector(k_array.size()));
+  int nx = 2001;
 
+  // std::ofstream myfile;
+  // myfile.open("../data/integrand.txt");
+  // Vector x_array = Utils::linspace(-16, 0, nx);
+  // double k = 340*cosmo->get_H0()/Constants.c;
+  // int iell = 19;
+  // std::cout << "ell = " <<  ells[iell] << std::endl;
+  // for(int ix=0; ix<nx; ix++){
+  //   double x = x_array[ix];
+  //   Spline j_ell_spline = j_ell_splines[iell];
+  //   double Delta_eta = cosmo->eta_of_x(0) - cosmo->eta_of_x(x);
+  //   double S = pert->get_Source_T(x,k);
+  //   double j = j_ell_spline(log(k*Delta_eta));
+  //   myfile << x << " " << j << " " << S << " " << j*S << "\n";
+  // }
+
+  #pragma omp parallel for schedule(dynamic, 1)
   for(size_t ik = 0; ik < k_array.size(); ik++){
+    std::cout << ik << "\n";
 
     //=============================================================================
     // TODO: Implement to solve for the general line of sight integral 
@@ -111,31 +129,52 @@ Vector2D PowerSpectrum::line_of_sight_integration_single(
     // ...
     // ...
     double k = k_array[ik];
-    Vector x_array = Utils::linspace(-16, 0, 1001);
+    Vector x_array = Utils::linspace(-16, 0, nx);
     Vector Theta_ell_ini = {0.0};
 
 
+    // ---- ODE ----
+    Spline j_ell_spline;
     for(int iell = 0; iell < ells.size(); iell++){
       int ell = ells[iell];
-      Spline j_ell_spline = j_ell_splines[iell];
+      j_ell_spline = j_ell_splines[iell];
 
-      ODEFunction dTheta_elldx = [&](double x, const double *Theta, double *dThetadx){
+    //   ODEFunction dTheta_elldx = [&](double x, const double *Theta, double *dThetadx){
+    //     double Delta_eta = cosmo->eta_of_x(0) - cosmo->eta_of_x(x);
+    //     double S = pert->get_Source_T(x,k);
+    //     double j = j_ell_spline(k*Delta_eta);
+
+    //     dThetadx[0] = S*j;
+    //     return GSL_SUCCESS;
+    //   };
+
+    //   ODESolver ode;
+    //   ode.solve(dTheta_elldx, x_array, Theta_ell_ini);
+    //   result[iell][ik] = ode.get_data_by_component(0)[1000];
+
+
+      // ---- integral ----
+      double integral = 0;
+      for(int ix=0; ix<nx; ix++){
+        double x = x_array[ix];
         double Delta_eta = cosmo->eta_of_x(0) - cosmo->eta_of_x(x);
         double S = pert->get_Source_T(x,k);
-        double j = j_ell_spline(k*Delta_eta);
-
-        dThetadx[0] = S*j;
-        return GSL_SUCCESS;
-      };
-
-    ODESolver ode;
-    ode.solve(dTheta_elldx, x_array, Theta_ell_ini);
-    result[iell][ik] = ode.get_data_by_component(0)[1000];
+        double term = k*Delta_eta;
+        if(term < 1e-8){
+          term = 1e-8;
+        }
+        double j = j_ell_spline(log(term));
+        std::cout << log(Delta_eta) << " " << log(k) << std::endl;
+        integral += j*S;
+      }
+      integral *= 16.0/nx;
+      result[iell][ik] = integral;
 
     }
     // Store the result for Source_ell(k) in results[ell][ik]
   }
 
+  // myfile.close();
   Utils::EndTiming("lineofsight");
   return result;
 }

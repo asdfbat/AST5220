@@ -277,7 +277,7 @@ void RecombinationHistory::solve_for_optical_depth_tau(){
     g_integral += g_arr[i];
   }
   g_tilde_of_x_spline.create(x_array, g_arr);
-  g_integral *= (x_end - x_start)/npts;
+  g_integral *= (0 - x_start)/npts;
   printf("Integral over g_tilde = %f\n", g_integral);
 
   Utils::EndTiming("opticaldepth");

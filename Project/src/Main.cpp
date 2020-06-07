@@ -13,8 +13,8 @@ int main(int argc, char **argv){
 
   // Background parameters
   double h           = 0.7;
-  double OmegaB      = 0.05; //0.046;
-  double OmegaCDM    = 0.45; //0.224;
+  double OmegaB      = 0.046; // 0.05; //0.046;
+  double OmegaCDM    = 0.224; //0.45;//0.224;
   double Neff        = 3.046;
   double TCMB        = 2.725;
 
@@ -76,12 +76,15 @@ int main(int argc, char **argv){
 
   PowerSpectrum power(&cosmo, &rec, &pert);
   power.solve();
-  power.output_Cell("../data/cells.txt");
-  power.output_P("../data/P.txt");
+  power.output_Cell("../data/cells_Quad.txt");
+  power.output_P("../data/P_Quad.txt");
   power.output_Theta("../data/Theta_l=2.txt", 0);
   power.output_Theta("../data/Theta_l=20.txt", 10);
   power.output_Theta("../data/Theta_l=120.txt", 20);
   power.output_Theta("../data/Theta_l=400.txt", 30);
+  power.output_Theta("../data/Theta_l=900.txt", 40);
+  power.output_Theta("../data/Theta_l=1400.txt", 50);
+  power.output_Theta("../data/Theta_l=1900.txt", 60);
   
   // Remove when module is completed
   return 0;
