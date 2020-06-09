@@ -39,7 +39,7 @@
 
 
 \begin{document}
-\title{AST5220\\ Milestone IV -- Pertubations}
+\title{AST5220\\ Milestone IV -- The CMB Power Spectrum}
 \author{
     \begin{tabular}{r l}
         Jonas Gahr Sturtzel Lunde & (\texttt{jonassl})
@@ -51,7 +51,19 @@ Code found at \url{https://github.com/asdfbat/AST5220/tree/master/Project}
 \vspace{0.7cm}
 
 \section{Introduction}
+Now that we've studied the necessary components about the background cosmology, the recombination history, and the perturbation evolutions, we are ready to assemble them all into our final result - the matter and temperature power spectra. We employ the source function in order to calculate a large span of $\Theta_\ell$s, which we use to calculate the temperature power spectrum. The matter power spectrum can be calculated directly from previously established parameters.
 
+We present our results in the rather standard cosmology, of
+\begin{align*}
+    h &= 0.7 \\
+    T_0 &= \SI{2.725}{K} \\
+    \Omega_r &= 5.042\times 10^{-5} \\
+    \Omega_b &= 0.046 \\
+    \Omega_{CDM} &= 0.224 \\
+    \Omega_\Lambda &= 1 - (\Omega_r + \Omega_b + \Omega_{CDM}) \\
+    Y_p &= 0
+\end{align*}
+as suggested by \cite{callin2006}.
 
 \section{Theory and method}
 \subsection{The source function}
@@ -124,19 +136,25 @@ The entire codebase can be compiled and run as \textbf{make all run}, which util
 \subsection{Matter power spectrum}
 Figure \ref{fig:MatterPower} shows the calculated matter power spectrum, with the point of $k_{peak}$ marked. We clearly see the primordial power spectrum slope of $\propto k^{n_s} \approx k$ before the peak, and the suppressed high k end with slope of $\propto k^{n_s-4} \approx k^{-3}$. The reason for the suppression on the high k end of the spectrum is the Meszaros effect, where small perturbations which entered the horizon before transitioning to the matter dominated era are suppressed by a power of $k^4$.
 
-\begin{figure}[h!]
+\begin{figure}[H]
     \centering
     \includegraphics[scale=0.5]{../m4_figs/MatterPower.png}
-    \caption{Matter power spectrum in $Mpc^3/h^3$. The "turnover point", corresponding to the peak of the spectrum, is marked at $k=\SI{0.012}{Mpc} = \SI{0.0084}{Mpc/h}$.}
+    \caption{Matter power spectrum in $Mpc^3/h^3$. The "turnover point", corresponding to the peak of the spectrum, is marked at $k=\SI{0.012}{Mpc^{-1}} = \SI{0.017}{h Mpc^{-1}}$.}
     \label{fig:MatterPower}
 \end{figure}
 
 
 
 \subsection{Photon temperature power spectrum}
-Figure \ref{fig:Cell} shown the temperature power spectrum, $C_\ell^{TT}$. 
+Figure \ref{fig:Cell} shown the temperature power spectrum, $C_\ell^{TT}$. At the largest scales (low $\ell$) the perturbations are superhorizontal until after recombination, and are unaffected by casual physics, explaining the flattening of the curve. At very low $\ell$, there is a slight upwards tilt, which is better explained by figure \ref{fig:Cell_all}, explored below.
 
-\begin{figure}[h!]
+Towards higher $\ell$, we see a series of peaks, initiated by the first peak at $\ell = 204$. Initial perturbations, blown up by inflation, will oscillate between over- and underdensity, in a fight between pressure and gravity. The peaks are the perturbations which happened to be at their maximum over- or underdensity exactly at recombination. The troughs are perturbations which happened to be exactly in between their maximum and minimum, at zero overdensity.
+
+The series of peaks have two notable traits. They generally decay towards higher $\ell$, and the odd peaks are taller than the even peaks. The first train reflects that very fine-grained perturbations tend to get "washed out" by photon diffusion, because their small relative size to the duration of last scattering. The fact that last scattering is not a single event, but takes some time, will dampen perturbations on scales which allow a photon-matter wave to travel through the perturbation.
+
+The second trait reflect the fact that every other peak represents either an over or underdensity of the photon-baryon plasma. The overdensities will be enhanced in amplitude with the "help" of the overdense baryons, which through gravity help the photons pull together. The opposite effect will happen in underdense peaks, making them shallower than the overdense peaks.
+
+\begin{figure}[H]
     \centering
     \includegraphics[scale=0.5]{../m4_figs/Cell.png}
     \caption{Photon temperature power spectrum, scaled by $\ell(\ell+1)/2\pi$, by convention, as function of $\ell$. The first maximum, at $\ell = 204$, is marked as a yellow point.}
@@ -145,7 +163,7 @@ Figure \ref{fig:Cell} shown the temperature power spectrum, $C_\ell^{TT}$.
 
 Figure \ref{fig:Cell_all} shows a decomposition of the temperature power spectrum into the four different contributing terms from the source function (equation \ref{eqn:source}). As we see, the Sachs-Wolfe term dominates at virtually all times, and decides all peaks and troughs in the power spectrum. The Doppler term also contributes a meaningful amount to the amplitude of the power spectrum, especially around $\ell=100$. We also see how the integrated Sachs-Wolfe effect contributes to the slight upwards slope towards very low $\ell$s. The quadrupole term is and should be completely negligible, but as far as I understand, the form of it is wrong. There is probably a bug somewhere in the calculation of the term.
 
-\begin{figure}[h!]
+\begin{figure}[H]
     \centering
     \includegraphics[scale=0.5]{../m4_figs/Cell_all.png}
     \caption{The same photon temperature power spectrum as in figure \ref{fig:Cell}, but separated into the four contributing terms from the source function.}
@@ -153,18 +171,21 @@ Figure \ref{fig:Cell_all} shows a decomposition of the temperature power spectru
 \end{figure}
 
 
-\begin{figure}[h!]
+\subsection{Transfer function and spectrum integrand}
+Figure \ref{fig:Theta} shows the transfer function $\Theta_\ell(k)$ as function of $k$-mode for different $\ell$s, plotted in a (somewhat unconventional) symmetric logarithmic plot. Figure \ref{fig:Theta2} shows the spectrum integrand $\Theta_\ell(k)^2/k$. I honestly have little idea of what to say about these. We can see that the high-$\ell$ mainly gets their contribution from the high end of $k$, and the other way around, which makes sense, as both $k$ and $\ell$ represents scales of sorts. The oscillating nature of the overdensities are also very obvious (although they here oscillate in scale, not time).
+
+\begin{figure}[H]
     \centering
     \includegraphics[scale=0.5]{../m4_figs/Theta.png}
-    \caption{}
-    \label{}
+    \caption{Transfer function $\Theta_\ell(k)$ for five selected $\ell$s.}
+    \label{fig:Theta}
 \end{figure}
 
-\begin{figure}[h!]
+\begin{figure}[H]
     \centering
     \includegraphics[scale=0.5]{../m4_figs/Theta2.png}
-    \caption{}
-    \label{}
+    \caption{Spectral integrand $\Theta_\ell(k)^2/k$ for five selected $\ell$s.}
+    \label{fig:Theta2}
 \end{figure}
 
 
