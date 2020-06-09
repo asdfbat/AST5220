@@ -438,7 +438,6 @@ void Perturbations::compute_source_functions(){
       Quad = 0.75/(ck*ck) * (dHpdx*dHpdx + Hp*ddHpddx)*g_tilde*Pi + 3.0*Hp*dHpdx*(dg_tildedx*Pi + g_tilde*dPidx) + Hp*Hp*(ddg_tildeddx*Pi + 2.0*dg_tildedx*dPidx + g_tilde*ddPiddx);
 
       ST_array[index] = SW + ISW - Dop + Quad;
-      // ST_array[index] = Quad;
 
 
     }
@@ -557,26 +556,6 @@ int Perturbations::rhs_full_ode(double x, double k, const double *y, double *dyd
   double &dPhidx          =  dydx[Constants.ind_Phi];
   double *dThetadx        = &dydx[Constants.ind_start_theta];
 
-  // Cosmological parameters and variables
-  // double Hp = cosmo->Hp_of_x(x);
-  // ...
-
-  // Recombination variables
-  // ...
-
-  //=============================================================================
-  // TODO: fill in the expressions for all the derivatives
-  //=============================================================================
-
-  // SET: Scalar quantities (Phi, delta, v, ...)
-  // ...
-  // ...
-  // ...
-
-  // SET: Photon multipoles (Theta_ell)
-  // ...
-  // ...
-  // ...
 
   const double ck = Constants.c*k;
   const double a  = exp(x);
@@ -595,8 +574,6 @@ int Perturbations::rhs_full_ode(double x, double k, const double *y, double *dyd
   // ...
   // ...
   // ...
-  // const double Theta2 = -4.0*ck/(9.0*Hp*dtaudx)*Theta[1];  // Theta[2] doesn't exist in tc array, so we set it here.
-
   const double Psi    = -Phi - 12.0*H0*H0/(ck*ck*a*a)*OmegaR*Theta[2];
 
   dPhidx        = Psi - ck*ck/(3.0*Hp*Hp)*Phi + H0*H0/(2.0*Hp*Hp)*(OmegaCDM/a*delta_cdm + OmegaB/a*delta_b + 4.0*OmegaR/(a*a)*Theta[0]);
@@ -612,12 +589,6 @@ int Perturbations::rhs_full_ode(double x, double k, const double *y, double *dyd
   }
   int l = Constants.n_ell_theta-1;
   dThetadx[l] = ck/Hp*Theta[l-1] - Constants.c*(l+1.0)/(Hp*cosmo->eta_of_x(x))*Theta[l] + dtaudx*Theta[l];
-
-
-  // const double q = (-((1 - R)*dtaudx + (1 + R)*ddtauddx)*(3*Theta[1] + v_b) - ck/Hp*Psi + (1 - dHpdx/Hp)*ck/Hp*(-Theta[0] + 2*Theta2) - ck/Hp*dThetadx[0])/((1 + R)*dtaudx + dHpdx/Hp - 1);
-  // dv_bdx = 1/(1 + R)*(-v_b - ck/Hp*Psi + R*(q + ck/Hp*(-Theta[0] + 2*Theta2) - ck/Hp*Psi));
-  // dThetadx[1] = 1.0/3.0*(q - dv_bdx);
-
 
   return GSL_SUCCESS;
 }

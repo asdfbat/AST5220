@@ -101,24 +101,8 @@ Vector2D PowerSpectrum::line_of_sight_integration_single(
   Vector2D result = Vector2D(ells.size(), Vector(k_array.size()));
   int nx = 2001;
 
-  // std::ofstream myfile;
-  // myfile.open("../data/integrand.txt");
-  // Vector x_array = Utils::linspace(-16, 0, nx);
-  // double k = 340*cosmo->get_H0()/Constants.c;
-  // int iell = 19;
-  // std::cout << "ell = " <<  ells[iell] << std::endl;
-  // for(int ix=0; ix<nx; ix++){
-  //   double x = x_array[ix];
-  //   Spline j_ell_spline = j_ell_splines[iell];
-  //   double Delta_eta = cosmo->eta_of_x(0) - cosmo->eta_of_x(x);
-  //   double S = pert->get_Source_T(x,k);
-  //   double j = j_ell_spline(log(k*Delta_eta));
-  //   myfile << x << " " << j << " " << S << " " << j*S << "\n";
-  // }
-
   #pragma omp parallel for schedule(dynamic, 1)
   for(size_t ik = 0; ik < k_array.size(); ik++){
-    std::cout << ik << "\n";
 
     //=============================================================================
     // TODO: Implement to solve for the general line of sight integral 
@@ -139,19 +123,6 @@ Vector2D PowerSpectrum::line_of_sight_integration_single(
       int ell = ells[iell];
       j_ell_spline = j_ell_splines[iell];
 
-    //   ODEFunction dTheta_elldx = [&](double x, const double *Theta, double *dThetadx){
-    //     double Delta_eta = cosmo->eta_of_x(0) - cosmo->eta_of_x(x);
-    //     double S = pert->get_Source_T(x,k);
-    //     double j = j_ell_spline(k*Delta_eta);
-
-    //     dThetadx[0] = S*j;
-    //     return GSL_SUCCESS;
-    //   };
-
-    //   ODESolver ode;
-    //   ode.solve(dTheta_elldx, x_array, Theta_ell_ini);
-    //   result[iell][ik] = ode.get_data_by_component(0)[1000];
-
 
       // ---- integral ----
       double integral = 0;
@@ -164,7 +135,6 @@ Vector2D PowerSpectrum::line_of_sight_integration_single(
           term = 1e-8;
         }
         double j = j_ell_spline(log(term));
-        std::cout << log(Delta_eta) << " " << log(k) << std::endl;
         integral += j*S;
       }
       integral *= 16.0/nx;
@@ -253,31 +223,6 @@ Vector PowerSpectrum::solve_for_cell(
   return result;
 }
 
-//====================================================
-// The primordial power-spectrum
-//====================================================
-
-double PowerSpectrum::primordial_power_spectrum(const double k) const{
-  return A_s * pow( Constants.Mpc * k / kpivot_mpc , n_s - 1.0);
-}
-
-//====================================================
-// P(k) in units of (Mpc)^3
-//====================================================
-
-double PowerSpectrum::get_matter_power_spectrum(const double x, const double k_mpc) const{
-  double pofk = 0.0;
-
-  //=============================================================================
-  // TODO: Compute the matter power spectrum
-  //=============================================================================
-
-  // ...
-  // ...
-  // ...
-
-  return pofk;
-}
 
 //====================================================
 // Get methods

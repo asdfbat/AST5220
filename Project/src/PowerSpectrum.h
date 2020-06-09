@@ -102,12 +102,6 @@ class PowerSpectrum {
     // Do all the solving: bessel functions, LOS integration and then compute Cells
     void solve();
 
-    // The dimensionless primordial power-spectrum Delta = 2pi^2/k^3 P(k)
-    double primordial_power_spectrum(const double k) const;
-
-    // Get P(k,x) for a given x in units of (Mpc)^3
-    double get_matter_power_spectrum(const double x, const double k_mpc) const;
-
     // Get the quantities we have computed
     double get_cell_TT(const double ell) const;
     double get_cell_TE(const double ell) const;
